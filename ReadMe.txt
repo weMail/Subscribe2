@@ -4,7 +4,10 @@ Donate link: https://getwemail.io
 Tags: posts, subscription, email, subscribe, notify, notification, newsletter, post notification, email marketing, optin, form
 Requires at least: 4.0
 Tested up to: 5.4
+Stable tag: trunk
+Requires PHP: 5.4
 License: GPLv3
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 Sends a list of subscribers an email notification when you publish new posts.
 
@@ -34,7 +37,7 @@ The format of the email can also be customised for per-post notifications, Subsc
 If you want to grow your subscriber lists, send automated campaigns to huge subscriber lists, you should upgrade to [weMail](https://getwemail.io).
 
 
-## Privacy Policy
+= Privacy Policy =
 Subscribe2 uses [Appsero](https://appsero.com) SDK to collect some telemetry data upon user's confirmation. This helps us to troubleshoot problems faster & make product improvements. Learn more about how [Appsero collects and uses this data](https://appsero.com/privacy-policy/).
 
 == Installation ==

@@ -66,7 +66,9 @@ if ( function_exists( 'set_time_limit' ) ) {
 }
 
 global $mysubscribe2;
+
 require_once S2PATH . 'classes/class-s2-core.php';
+
 if ( is_admin() ) {
 	require_once S2PATH . 'classes/class-s2-admin.php';
 	$mysubscribe2 = new S2_Admin();
@@ -74,6 +76,7 @@ if ( is_admin() ) {
 	require_once S2PATH . 'classes/class-s2-frontend.php';
 	$mysubscribe2 = new S2_Frontend();
 }
+
 add_action( 'plugins_loaded', array( $mysubscribe2, 's2init' ) );
 
 /**
