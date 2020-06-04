@@ -33,6 +33,10 @@ The format of the email can also be customised for per-post notifications, Subsc
 
 If you want to grow your subscriber lists, send automated campaigns to huge subscriber lists, you should upgrade to [weMail](https://getwemail.io).
 
+
+## Privacy Policy
+Subscribe2 uses [Appsero](https://appsero.com) SDK to collect some telemetry data upon user's confirmation. This helps us to troubleshoot problems faster & make product improvements. Learn more about how [Appsero collects and uses this data](https://appsero.com/privacy-policy/).
+
 == Installation ==
 
 = AUTOMATIC INSTALLATION =
@@ -65,4 +69,4 @@ This token will automatically be replaced by dynamic subscription information an
 
 == Changelog ==
 
-See complete changelog installed in the same folder as this readme.
+See complete [changelog](https://github.com/weMail/Subscribe2/blob/master/changeLog.txt).

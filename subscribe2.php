@@ -75,3 +75,20 @@ if ( is_admin() ) {
 	$mysubscribe2 = new S2_Frontend();
 }
 add_action( 'plugins_loaded', array( $mysubscribe2, 's2init' ) );
+
+/**
+ * Initialize the plugin tracker
+ *
+ * @return void
+ */
+function subscribe2_init_appsero() {
+
+    if ( ! class_exists( 'Appsero\Client' ) ) {
+    	require_once S2PATH . 'include/appsero/src/Client.php';
+    }
+
+    $client = new Appsero\Client( '6c1e710d-aab6-4d4b-b29d-aad2ff773f4c', 'Subscribe2', __FILE__ );
+    $client->insights()->init();
+}
+
+subscribe2_init_appsero();
