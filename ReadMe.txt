@@ -4,7 +4,7 @@ Donate link: https://getwemail.io
 Tags: posts, subscription, email, subscribe, notify, notification, newsletter, post notification, email marketing, optin, form
 Requires at least: 4.0
 Tested up to: 5.4
-Stable tag: trunk
+Stable tag: 10.33
 Requires PHP: 5.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -71,5 +71,10 @@ This token will automatically be replaced by dynamic subscription information an
 [Visit FAQ site](https://subscribe2.wordpress.com/support/faqs/)
 
 == Changelog ==
+
+= 10.33 (4th June, 2020) =
+
+ * Bump tested upto version 4.4
+ * Minimum PHP version set to 5.4
 
 See complete [changelog](https://github.com/weMail/Subscribe2/blob/master/changeLog.txt).
