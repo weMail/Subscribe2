@@ -77,4 +77,4 @@ This token will automatically be replaced by dynamic subscription information an
  * Bump tested upto version 4.4
  * Minimum PHP version set to 5.4
 
-See complete [changelog](https://github.com/weMail/Subscribe2/blob/master/changeLog.txt).
+See complete [changelog](https://github.com/weMail/Subscribe2/blob/develop/changeLog.txt).
