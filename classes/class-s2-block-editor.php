@@ -161,8 +161,7 @@ class S2_Block_Editor {
 	 * Enqueue Block Editor assets
 	 */
 	public function gutenberg_block_editor_assets() {
-		global $pagenow;
-		if ( ! in_array( $pagenow, array( 'post-new.php', 'post.php', 'page-new.php', 'page.php' ), true ) ) {
+		if ( ! in_array( get_post_type(), array( 'post', 'page' ) ) ) {
 			return;
 		}
 
