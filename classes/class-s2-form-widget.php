@@ -195,17 +195,4 @@ class S2_Form_Widget extends WP_Widget {
 		echo '</div>' . "\r\n";
 	}
 
-	public function preview_widget ($shortcode) {
-		// echo site_url('/') . "wp-admin/admin-ajax.php?action=s2_preview&shortcode=" . $shortcode;
-		echo do_shortcode($shortcode);
-		?>
-			<div height="500px" className="wemail-block-form-preview">
-                    <div className="s2-block-overlay"/>
-                    <iframe className="" width="100%"
-                            src="<?php echo site_url( '/' ); ?>wp-admin/admin-ajax.php?action=s2_preview&shortcode=<?php echo base64_encode($shortcode); ?>"}
-                            frameBorder="0" scrolling="no"/>
-                </div>
-		<?php
-	}
-
 } // End S2_Form_widget class

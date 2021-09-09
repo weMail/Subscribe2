@@ -1396,9 +1396,7 @@ class S2_Core {
 	 */
 	public function subscribe2_widget() {
 		require_once S2PATH . 'classes/class-s2-form-widget.php';
-		require_once S2PATH . 'admin/WidgetPreview.php';
 		register_widget( 'S2_Form_Widget' );
-		// new WidgetPreview();
 	}
 
 	/**
