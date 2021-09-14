@@ -1895,7 +1895,7 @@ class S2_Core {
 		}
 
 		// add core actions
-		add_filter( 'cron_schedules', array( &$this, 'add_weekly_sched' ), 20 );
+		add_filter( 's2_cron_schedules', array( &$this, 'add_weekly_sched' ), 20 );
 		// add actions for automatic subscription based on option settings
 		if ( $this->s2_mu ) {
 			add_action( 'wpmu_activate_user', array( &$s2class_multisite, 'wpmu_add_user' ) );

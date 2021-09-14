@@ -152,7 +152,7 @@ class Insights {
         add_action( 'wp_ajax_' . $this->client->slug . '_submit-uninstall-reason', array( $this, 'uninstall_reason_submission' ) );
 
         // cron events
-        add_filter( 'cron_schedules', array( $this, 'add_weekly_schedule' ) );
+        add_filter( 's2_cron_schedules', array( $this, 'add_weekly_schedule' ) );
         add_action( $this->client->slug . '_tracker_send_event', array( $this, 'send_tracking_data' ) );
         // add_action( 'admin_init', array( $this, 'send_tracking_data' ) ); // test
     }
