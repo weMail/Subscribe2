@@ -246,7 +246,7 @@ class S2_Core {
      * @return string|string[]
      */
 	public function parse_unsubscribe_link( $content, $recipient ) {
-	    $page_url = get_page_link( true );
+	    $page_url = get_page_link( $this->subscribe2_options['s2_unsub_page'] );
 	    $query = parse_url( $page_url, PHP_URL_QUERY );
 	    $page_url .= ( ( $query ? '&' : '?' ) . 's2_unsub=' . base64_encode( $recipient ) );
 
@@ -1895,7 +1895,7 @@ class S2_Core {
 		}
 
 		// add core actions
-		add_filter( 's2_cron_schedules', array( &$this, 'add_weekly_sched' ), 20 );
+		add_filter( 'cron_schedules', array( &$this, 'add_weekly_sched' ), 20 );
 		// add actions for automatic subscription based on option settings
 		if ( $this->s2_mu ) {
 			add_action( 'wpmu_activate_user', array( &$s2class_multisite, 'wpmu_add_user' ) );

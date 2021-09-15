@@ -804,6 +804,9 @@ class S2_Admin extends S2_Core {
 		asort( $sort );
 		$schedule_sorted = array();
 		foreach ( $sort as $key => $value ) {
+			if (! preg_match('/never|weekly|monthly|twicedaily|hourly/', $key)) {
+				continue;
+			}
 			$schedule_sorted[ $key ] = $schedule[ $key ];
 		}
 		foreach ( $schedule_sorted as $key => $value ) {
