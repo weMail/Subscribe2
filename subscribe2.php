@@ -65,6 +65,7 @@ if ( function_exists( 'set_time_limit' ) ) {
 	set_time_limit( 300 );
 }
 
+
 global $mysubscribe2;
 
 require_once S2PATH . 'classes/class-s2-core.php';
