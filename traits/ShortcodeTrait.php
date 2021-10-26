@@ -166,8 +166,7 @@ trait Shortcode {
 		}
 		$this->s2form = apply_filters( 's2_form', $this->form, $args );
 
-        global $user_ID;
-        if ( 0 !== $user_ID ) {
+        if ( is_user_logged_in() ) {
             return $this->profile;
         }
 
