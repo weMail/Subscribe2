@@ -1,6 +1,58 @@
 <?php
 
 trait Shortcode {
+    /* ===== define some variables ===== */
+    public $profile = '';
+
+    /**
+     * Load all our strings
+     */
+    public function load_strings() {
+        // Translators: Link to login page
+        $this->please_log_in = '<p class="s2_message">' . sprintf( __( 'To manage your subscription options please <a href="%1$s">login</a>.', 'subscribe2' ), get_option( 'siteurl' ) . '/wp-login.php' ) . '</p>';
+
+        $profile = apply_filters( 's2_profile_link', get_option( 'siteurl' ) . '/wp-admin/admin.php?page=s2' );
+        // Translators: Link to Profile page
+        $this->profile = '<p class="s2_message">' . sprintf( __( 'You may manage your subscription options from your <a href="%1$s">profile</a>.', 'subscribe2' ), $profile ) . '</p>';
+        if ( true === $this->s2_mu ) {
+            global $blog_id;
+            $user_ID = get_current_user_id();
+            if ( ! is_user_member_of_blog( $user_ID, $blog_id ) ) {
+                // if we are on multisite and the user is not a member of this blog change the link
+                $mu_profile = apply_filters( 's2_mu_profile_link', get_option( 'siteurl' ) . '/wp-admin/?s2mu_subscribe=' . $blog_id );
+                // Translators: Link to Profile page
+                $this->profile = '<p class="s2_message">' . sprintf( __( '<a href="%1$s">Subscribe</a> to email notifications when this blog posts new content.', 'subscribe2' ), $mu_profile ) . '</p>';
+            }
+        }
+
+        $this->confirmation_sent = '<p class="s2_message">' . __( 'A confirmation message is on its way!', 'subscribe2' ) . '</p>';
+
+        $this->already_subscribed = '<p class="s2_error">' . __( 'That email address is already subscribed.', 'subscribe2' ) . '</p>';
+
+        $this->not_subscribed = '<p class="s2_error">' . __( 'That email address is not subscribed.', 'subscribe2' ) . '</p>';
+
+        $this->not_an_email = '<p class="s2_error">' . __( 'Sorry, but that does not look like an email address to me.', 'subscribe2' ) . '</p>';
+
+        $this->barred_domain = '<p class="s2_error">' . __( 'Sorry, email addresses at that domain are currently barred due to spam, please use an alternative email address.', 'subscribe2' ) . '</p>';
+
+        $this->error = '<p class="s2_error">' . __( 'Sorry, there seems to be an error on the server. Please try again later.', 'subscribe2' ) . '</p>';
+
+        // confirmation messages
+        $this->no_such_email = '<p class="s2_error">' . __( 'No such email address is registered.', 'subscribe2' ) . '</p>';
+
+        $this->added = '<p class="s2_message">' . __( 'You have successfully subscribed!', 'subscribe2' ) . '</p>';
+
+        $this->deleted = '<p class="s2_message">' . __( 'You have successfully unsubscribed.', 'subscribe2' ) . '</p>';
+
+        $this->subscribe = __( 'subscribe', 'subscribe2' ); //ACTION replacement in subscribing confirmation email
+
+        $this->unsubscribe = __( 'unsubscribe', 'subscribe2' ); //ACTION replacement in unsubscribing in confirmation email
+
+        if ( isset( $_GET['s2_unsub'] ) && ! empty( $_GET['s2_unsub'] ) ) {
+            $this->unsubscribe( $_GET['s2_unsub'] );
+        }
+    }
+
     /* ===== template and filter functions ===== */
 	/**
 	 * Display our form; also handles (un)subscribe requests
@@ -113,6 +165,11 @@ trait Shortcode {
 			$this->form = '<form name="' . $form_name . '" method="post"' . $action . '><input type="hidden" name="ip" value="' . esc_attr( $_SERVER['REMOTE_ADDR'] ) . '" />' . $antispam_text . '<p><label for="s2email">' . __( 'Your email:', 'subscribe2' ) . '</label><br><input type="email" name="email" id="s2email" value="' . $value . '" size="' . $args['size'] . '" onfocus="if (this.value === \'' . $value . '\') {this.value = \'\';}" onblur="if (this.value === \'\') {this.value = \'' . $value . '\';}" />' . $wrap_text . $this->input_form_action . '</p></form>' . "\r\n";
 		}
 		$this->s2form = apply_filters( 's2_form', $this->form, $args );
+
+        global $user_ID;
+        if ( 0 !== $user_ID ) {
+            return $this->profile;
+        }
 
 		if ( isset( $_POST['subscribe'] ) || isset( $_POST['unsubscribe'] ) ) {
 			// anti spam sign up measure
