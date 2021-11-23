@@ -83,14 +83,14 @@ if ( isset( $_POST['s2_admin'] ) ) {
 	} elseif ( isset( $_POST['remind'] ) ) {
 		$this->remind( $_POST['reminderemails'] );
 		echo '<div id="message" class="updated fade"><p><strong>' . esc_html__( 'Reminder Email(s) Sent!', 'subscribe2' ) . '</strong></p></div>';
-	} elseif ( isset( $_POST['sub_categories'] ) && 'subscribe' === $_POST['manage'] ) {
+	} elseif ( isset( $_POST['sub_categories'] ) && 'subscribe' === (isset($_POST['manage']) ? $_POST['manage'] : '') ) {
 		if ( isset( $_REQUEST['subscriber'] ) ) {
 			$this->subscribe_registered_users( implode( ",\r\n", $_REQUEST['subscriber'] ), $s2_request_category );
 		} else {
 			$this->subscribe_registered_users( $_POST['exportcsv'], $s2_request_category );
 		}
 		echo '<div id="message" class="updated fade"><p><strong>' . esc_html__( 'Registered Users Subscribed!', 'subscribe2' ) . '</strong></p></div>';
-	} elseif ( isset( $_POST['sub_categories'] ) && 'unsubscribe' === $_POST['manage'] ) {
+	} elseif ( isset( $_POST['sub_categories'] ) && 'unsubscribe' === (isset($_POST['manage']) ? $_POST['manage'] : '') ) {
 		if ( isset( $_REQUEST['subscriber'] ) ) {
 			$this->unsubscribe_registered_users( implode( ",\r\n", $_REQUEST['subscriber'] ), $s2_request_category );
 		} else {
