@@ -1877,11 +1877,13 @@ class S2_Core {
 		}
 
 		// do we need to install anything?
-		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->subscribe2 ) ) !== $wpdb->subscribe2 ) {
-			require_once S2PATH . 'classes/class-s2-upgrade.php';
-			global $s2_upgrade;
-			$s2_upgrade = new S2_Upgrade();
-			$s2_upgrade->install();
+		if ( is_admin() && current_user_can( 'manage_options' ) ) {
+			if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->subscribe2 ) ) !== $wpdb->subscribe2 ) {
+				require_once S2PATH . 'classes/class-s2-upgrade.php';
+				global $s2_upgrade;
+				$s2_upgrade = new S2_Upgrade();
+				$s2_upgrade->install();
+			}
 		}
 
 		//do we need to upgrade anything?
