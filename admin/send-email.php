@@ -5,9 +5,11 @@ if ( ! function_exists( 'add_action' ) ) {
 
 global $current_user;
 
+$s2_admin = ! empty( $_POST['s2_admin'] ) ? esc_url( $_POST['s2_admin'] ) : '';
+
 // was anything POSTed?
-if ( isset( $_POST['s2_admin'] ) && 'mail' === $_POST['s2_admin'] ) {
-	if ( false === wp_verify_nonce( $_REQUEST['_wpnonce'], 'subscribe2-write_subscribers' . S2VERSION ) ) {
+if ( 'mail' === $s2_admin ) {
+	if ( isset( $_REQUEST['_wpnonce'] ) && ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'subscribe2-write_subscribers' . S2VERSION ) ) {
 		die( '<p>' . esc_html__( 'Security error! Your request cannot be completed.', 'subscribe2' ) . '</p>' );
 	}
 

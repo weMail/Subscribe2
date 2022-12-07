@@ -177,12 +177,20 @@ class S2_List_Table extends WP_List_Table {
 	}
 
 	public function process_bulk_action() {
-		if ( in_array( $this->current_action(), array( 'delete', 'toggle' ), true ) ) {
-			if ( ! isset( $_REQUEST['subscriber'] ) ) {
-				echo '<div id="message" class="error"><p><strong>' . esc_html__( 'No users were selected.', 'subscribe2' ) . '</strong></p></div>';
-				return;
-			}
+		if ( ! in_array( $this->current_action(), array( 'delete', 'toggle' ), true ) ) {
+			return;
 		}
+
+		if ( empty( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'bulk-subscribers' ) ) {
+			echo '<div id="message" class="error"><p><strong>' . __( 'Error: Nonce verification failed.', 'subscribe2' ) . '</strong></p></div>';
+			return;
+		}
+
+		if ( ! isset( $_REQUEST['subscriber'] ) ) {
+			echo '<div id="message" class="error"><p><strong>' . esc_html__( 'No users were selected.', 'subscribe2' ) . '</strong></p></div>';
+			return;
+		}
+
 		if ( 'delete' === $this->current_action() ) {
 			global $mysubscribe2, $current_user, $subscribers;
 			$message = array();
@@ -212,6 +220,7 @@ class S2_List_Table extends WP_List_Table {
 			$final_message = implode( '<br><br>', array_filter( $message ) );
 			echo '<div id="message" class="updated fade"><p><strong>' . esc_html( $final_message ) . '</strong></p></div>';
 		}
+
 		if ( 'toggle' === $this->current_action() ) {
 			global $mysubscribe2, $current_user, $subscribers;
 			$mysubscribe2->ip = $current_user->user_login;
