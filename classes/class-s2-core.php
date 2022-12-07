@@ -1,9 +1,14 @@
 <?php
 require_once S2PATH . 'traits/ShortcodeTrait.php';
 
+/**
+ * Block editor handler class.
+ */
 class S2_Core {
+
 	use Shortcode;
-	// variables and constructor are declared at the end
+
+	// Variables and constructor are declared at the end.
 	/**
 	 * Load translations
 	 */
