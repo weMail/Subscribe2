@@ -21,7 +21,7 @@ class S2_Forms {
 	 * @return int|mixed|string|void|null
 	 */
 	public function get_userid() {
-		$userid = ! empty( $_GET['id'] ) ? absint( $_GET['id'] ) : '';
+		$userid = ! empty( $_GET['id'] ) ? intval( $_GET['id'] ) : '';
 
 		if ( empty( $userid ) ) {
 			global $user_ID;
