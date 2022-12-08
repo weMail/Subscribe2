@@ -23,8 +23,6 @@ if ( ! class_exists( 'Subscribe2_List_Table' ) ) {
 	$s2_list_table = new S2_List_Table();
 }
 
-error_log( print_r( $_REQUEST, 1 ) );
-
 // Was anything POSTed?
 if ( isset( $_POST['s2_admin'] ) ) {
 	$export_csv = ! empty( $_POST['exportcsv'] ) ? sanitize_text_field( $_POST['exportcsv'] ) : '';
