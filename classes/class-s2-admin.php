@@ -920,12 +920,12 @@ class S2_Admin extends S2_Core {
 		}
 
 		if ( $inc_author ) {
-			$author[] = array(
+			$author[] = (object) array(
 				'ID'           => 'author',
 				'display_name' => __( 'Post Author', 'subscribe2' ),
 			);
 
-			$author[] = array(
+			$author[] = (object) array(
 				'ID'           => 'blogname',
 				'display_name' => html_entity_decode( get_option( 'blogname' ), ENT_QUOTES ),
 			);
