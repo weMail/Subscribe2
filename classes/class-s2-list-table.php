@@ -97,7 +97,7 @@ class S2_List_Table extends WP_List_Table {
 	/**
 	 * Checkbox column.
 	 *
-	 * @param $item
+	 * @param array $item
 	 *
 	 * @return string
 	 */

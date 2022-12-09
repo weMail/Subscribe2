@@ -8,7 +8,7 @@ trait Shortcode {
 	/**
 	 * @var ?string
 	 */
-    public $profile = '';
+	public $profile = '';
 
     /**
      * Load all our strings
@@ -17,8 +17,8 @@ trait Shortcode {
      */
     public function load_strings() {
 	    /* translators: Placeholders: %s - link to login page */
-        $this->please_log_in = '<p class="s2_message">' . sprintf( __( 'To manage your subscription options please <a href="%1$s">login</a>.', 'subscribe2' ), get_option( 'siteurl' ) . '/wp-login.php' ) . '</p>';
-        $profile             = apply_filters( 's2_profile_link', get_option( 'siteurl' ) . '/wp-admin/admin.php?page=s2' );
+	    $this->please_log_in = '<p class="s2_message">' . sprintf( __( 'To manage your subscription options please <a href="%1$s">login</a>.', 'subscribe2' ), get_option( 'siteurl' ) . '/wp-login.php' ) . '</p>';
+	    $profile             = apply_filters( 's2_profile_link', get_option( 'siteurl' ) . '/wp-admin/admin.php?page=s2' );
 
         /* translators: Placeholders: %s - link to Profile page */
         $this->profile = '<p class="s2_message">' . sprintf( __( 'You may manage your subscription options from your <a href="%1$s">profile</a>.', 'subscribe2' ), $profile ) . '</p>';
@@ -31,7 +31,7 @@ trait Shortcode {
                 // If we are on multisite and the user is not a member of this blog change the link.
                 $mu_profile = apply_filters( 's2_mu_profile_link', get_option( 'siteurl' ) . '/wp-admin/?s2mu_subscribe=' . $blog_id );
 	            /* translators: Placeholders: %s - link to profile page */
-                $this->profile = '<p class="s2_message">' . sprintf( __( '<a href="%1$s">Subscribe</a> to email notifications when this blog posts new content.', 'subscribe2' ), $mu_profile ) . '</p>';
+	            $this->profile = '<p class="s2_message">' . sprintf( __( '<a href="%1$s">Subscribe</a> to email notifications when this blog posts new content.', 'subscribe2' ), $mu_profile ) . '</p>';
             }
         }
 
@@ -181,11 +181,7 @@ trait Shortcode {
 
 		// Anti spam sign up measure.
 		if ( isset( $_POST['subscribe'] ) || isset( $_POST['unsubscribe'] ) ) {
-			if (
-				( isset( $_POST['firstname'] ) && '' !== $_POST['firstname'] ) ||
-				( isset( $_POST['lastname'] ) && '' !== $_POST['lastname'] ) ||
-				( isset( $_POST['uri'] ) && 'http://' !== $_POST['uri'] )
-			) {
+			if ( ! empty( $_POST['firstname'] ) || ! empty( $_POST['lastname'] ) || ( ! emtpy( $_POST['uri'] ) && 'http://' !== $_POST['uri'] ) ) {
 				// Looks like some invisible-to-user fields were changed; falsely report success.
 				return $this->confirmation_sent;
 			}
@@ -217,7 +213,7 @@ trait Shortcode {
 					}
 				}
 
-				// Does the supplied email belong to a registered user?.
+				// Does the supplied email belong to a registered user?
 				$check = $wpdb->get_var(
 					$wpdb->prepare(
 						"SELECT user_email FROM $wpdb->users WHERE user_email = %s",
@@ -276,10 +272,10 @@ trait Shortcode {
 		return $this->s2form;
 	}
 
-    /**
+	/**
 	 * Collect and return the IP address of the remote client machine.
-     *
-     * @return bool
+	 *
+	 * @return bool
 	 */
 	public function get_remote_ip() {
 		$remote_ip = false;

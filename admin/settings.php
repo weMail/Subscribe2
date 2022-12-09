@@ -12,9 +12,10 @@ if ( isset( $_POST['s2_admin'] ) ) {
 	}
 
 	if ( isset( $_POST['reset'] ) ) {
+		require_once S2PATH . 'classes/class-s2-upgrade.php';
+
 		global $s2_upgrade;
 
-		require_once S2PATH . 'classes/class-s2-upgrade.php';
 		$s2_upgrade = new S2_Upgrade();
 		$s2_upgrade->reset();
 

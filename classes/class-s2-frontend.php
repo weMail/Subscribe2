@@ -99,7 +99,7 @@ class S2_Frontend extends S2_Core {
 	 *
 	 * @param string $content
 	 *
-	 *
+	 * @return mixed|string|void|null
 	 */
 	public function confirm( $content = '' ) {
 		global $wpdb;
@@ -173,7 +173,8 @@ class S2_Frontend extends S2_Core {
 			return false;
 		}
 
-		$subject = empty( get_option( 'blogname' ) ) ? '[' . stripslashes( html_entity_decode( get_option( 'blogname' ), ENT_QUOTES ) ) . '] ' : '';
+		$blogname = get_option( 'blogname' );
+		$subject  = empty( $blogname ) ? '[' . stripslashes( html_entity_decode( $blogname, ENT_QUOTES ) ) . '] ' : '';
 		if ( 'subscribe' === $action ) {
 			$subject .= __( 'New Subscription', 'subscribe2' );
 			$message  = $this->email . ' ' . __( 'subscribed to email notifications!', 'subscribe2' );

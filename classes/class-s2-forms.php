@@ -6,6 +6,13 @@
 class S2_Forms {
 
 	/**
+	 * Define some variables.
+	 *
+	 * @var string
+	 */
+	private $all_authors = '';
+
+	/**
 	 * Functions to Display content of Your Subscriptions page and process any input.
 	 *
 	 * @return void
@@ -282,7 +289,7 @@ class S2_Forms {
 				$catids   = '';
 				$all_cats = $mysubscribe2->all_cats( false, 'ID' );
 				foreach ( $all_cats as $cat ) {
-					$catids .= empty( $catids ) ? $cat->term_id : ",$cat->term_id";
+					$catids .= empty( $catids ) ? $cat->term_id : ", $cat->term_id";
 					update_user_meta( $userid, $mysubscribe2->get_usermeta_keyname( 's2_cat' ) . $cat->term_id, $cat->term_id );
 				}
 
@@ -493,9 +500,4 @@ class S2_Forms {
 
 		return apply_filters( 's2_authors', $this->all_authors );
 	}
-
-	/**
-	 * Define some variables.
-	 */
-	private $all_authors = '';
 }

@@ -1235,7 +1235,7 @@ class S2_Admin extends S2_Core {
 
 			$cats_string = '';
 			foreach ( $all_cats as $cat ) {
-				$cats_string .= empty( $cats_string ) ? "$cat->term_id" : ",$cat->term_id";
+				$cats_string .= empty( $cats_string ) ? $cat->term_id : ", $cat->term_id";
 			}
 
 			foreach ( $user_ids as $user_id ) {

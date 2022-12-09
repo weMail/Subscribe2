@@ -35,8 +35,8 @@ if ( ! class_exists( 'MO_Admin_Notice' ) ) {
 		}
 
 		/**
-         * Admin notice handler.
-         *
+		 * Admin notice handler.
+		 *
 		 * @return void
 		 */
 		public function admin_notice() {
@@ -73,7 +73,7 @@ if ( ! class_exists( 'MO_Admin_Notice' ) ) {
 						<p>
 							<?php
 							printf(
-							    /* translators: Placeholders: %s - mail option admin notice */
+							        /* translators: Placeholders: %s - mail option admin notice */
 								__( 'Free email newsletter plugin that will %1$sincrease your email list subscribers%2$s and keep them engaged with %1$sautomated and schedule newsletters%2$s.', 'subscribe2' ),
 								'<span class="mo-stylize"><strong>',
 								'</strong></span>'
@@ -108,8 +108,8 @@ if ( ! class_exists( 'MO_Admin_Notice' ) ) {
 		}
 
 		/**
-         * Get current admin url.
-         *
+		 * Get current admin url.
+		 *
 		 * @return string
 		 */
 		public function current_admin_url() {
@@ -126,8 +126,8 @@ if ( ! class_exists( 'MO_Admin_Notice' ) ) {
 		}
 
 		/**
-         * Check if wemail installed.
-         *
+		 * Check if wemail installed.
+		 *
 		 * @return bool
 		 */
 		public function is_plugin_installed() {
@@ -146,8 +146,8 @@ if ( ! class_exists( 'MO_Admin_Notice' ) ) {
 		}
 
 		/**
-         * Admin notice additional styles.
-         *
+		 * Admin notice additional styles.
+		 *
 		 * @return void
 		 */
 		public function notice_css() {
@@ -201,8 +201,8 @@ if ( ! class_exists( 'MO_Admin_Notice' ) ) {
 		}
 
 		/**
-         * MO_Admin_Notice class instantiate.
-         *
+		 * MO_Admin_Notice class instantiate.
+		 *
 		 * @return MO_Admin_Notice|null
 		 */
 		public static function instance() {

@@ -1071,6 +1071,8 @@ class S2_Core {
 	 * Is the supplied email address a registered user of the blog?
 	 *
 	 * @param string $email
+	 *
+	 * @return bool
 	 */
 	public function is_registered( $email = '' ) {
 		global $wpdb;
@@ -2075,7 +2077,7 @@ class S2_Core {
 		$display    = $scheds[ $email_freq ]['display'];
 
 		$blogname = get_option( 'blogname' );
-		$subject  = ! empty( $blogname ) ? '[' . stripslashes( html_entity_decode( get_option( 'blogname' ), ENT_QUOTES ) ) . '] ' : $blogname;
+		$subject  = ! empty( $blogname ) ? '[' . stripslashes( html_entity_decode( $blogname, ENT_QUOTES ) ) . '] ' : $blogname;
 
 		$subject .= $display . ' ' . __( 'Digest Email', 'subscribe2' );
 		$mailtext = str_replace( '{TABLELINKS}', $tablelinks, $mailtext );

@@ -3,7 +3,7 @@ if ( ! defined( 'ABSPATH' ) && ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit(); // Make sure not to call this file directly.
 }
 
-// Is Subscribe2 HTML active
+// Is Subscribe2 HTML active.
 if ( is_plugin_active( 'subscribe2_html/subscribe2.php' ) ) {
 	return;
 }
