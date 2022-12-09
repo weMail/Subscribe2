@@ -16,9 +16,9 @@ trait Shortcode {
      * @return void
      */
     public function load_strings() {
-    /* translators: Placeholders: %s - link to login page */
-    $this->please_log_in = '<p class="s2_message">' . sprintf( __( 'To manage your subscription options please <a href="%1$s">login</a>.', 'subscribe2' ), get_option( 'siteurl' ) . '/wp-login.php' ) . '</p>';
-    $profile             = apply_filters( 's2_profile_link', get_option( 'siteurl' ) . '/wp-admin/admin.php?page=s2' );
+	    /* translators: Placeholders: %s - link to login page */
+	    $this->please_log_in = '<p class="s2_message">' . sprintf( __( 'To manage your subscription options please <a href="%1$s">login</a>.', 'subscribe2' ), get_option( 'siteurl' ) . '/wp-login.php' ) . '</p>';
+	    $profile             = apply_filters( 's2_profile_link', get_option( 'siteurl' ) . '/wp-admin/admin.php?page=s2' );
 
         /* translators: Placeholders: %s - link to Profile page */
         $this->profile = '<p class="s2_message">' . sprintf( __( 'You may manage your subscription options from your <a href="%1$s">profile</a>.', 'subscribe2' ), $profile ) . '</p>';
@@ -30,8 +30,8 @@ trait Shortcode {
             if ( ! is_user_member_of_blog( $user_ID, $blog_id ) ) {
                 // If we are on multisite and the user is not a member of this blog change the link.
                 $mu_profile = apply_filters( 's2_mu_profile_link', get_option( 'siteurl' ) . '/wp-admin/?s2mu_subscribe=' . $blog_id );
-            /* translators: Placeholders: %s - link to profile page */
-            $this->profile = '<p class="s2_message">' . sprintf( __( '<a href="%1$s">Subscribe</a> to email notifications when this blog posts new content.', 'subscribe2' ), $mu_profile ) . '</p>';
+	            /* translators: Placeholders: %s - link to profile page */
+	            $this->profile = '<p class="s2_message">' . sprintf( __( '<a href="%1$s">Subscribe</a> to email notifications when this blog posts new content.', 'subscribe2' ), $mu_profile ) . '</p>';
             }
         }
 
