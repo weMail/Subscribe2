@@ -276,7 +276,7 @@ class S2_Admin extends S2_Core {
 	 * @return false|void
 	 */
 	public function s2_dismiss_notice_handler() {
-		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 's2_dismiss_nonce' ) ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 's2_dismiss_nonce' ) ) {
 			return false;
 		}
 
@@ -526,7 +526,7 @@ class S2_Admin extends S2_Core {
 	 * @return void
 	 */
 	public function s2_meta_handler( $post_id ) {
-		if ( ! isset( $_POST['s2meta_nonce'] ) || ! wp_verify_nonce( $_POST['s2meta_nonce'], wp_hash( plugin_basename( __FILE__ ) ) ) ) {
+		if ( ! isset( $_POST['s2meta_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['s2meta_nonce'] ), wp_hash( plugin_basename( __FILE__ ) ) ) ) {
 			return $post_id;
 		}
 

@@ -114,12 +114,12 @@ class S2_Ajax {
 	 * @return void
 	 */
 	public function s2_ajax_submit_handler() {
-		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 's2_ajax_form_nonce' ) ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 's2_ajax_form_nonce' ) ) {
 			echo '<p>' . esc_html__( 'There was an error validating your request. Please try again later.', 'subscribe2' ) . '</p>';
 			wp_die();
 		}
 
-		$data = ! empty( $_POST['data'] ) ? map_deep( $_POST['data'], 'sanitize_text_field' ) : array();
+		$data = ! empty( $_POST['data'] ) ? array_map( 'sanitize_text_field', $_POST['data'] ) : array();
 		if (
 			( isset( $data['firstname'] ) && ! empty( $data['firstname'] ) ) ||
 			( isset( $data['lastname'] ) && ! empty( $data['lastname'] ) ) ||

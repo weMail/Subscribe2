@@ -6,7 +6,7 @@ if ( ! function_exists( 'add_action' ) ) {
 global $subscribers, $what, $current_tab;
 
 // Detect or define which tab we are in.
-$current_tab = isset( $_GET['tab'] ) ? esc_attr( $_GET['tab'] ) : 'public';
+$current_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'public';
 
 // Access function to allow display for form elements.
 require_once S2PATH . 'classes/class-s2-forms.php';
@@ -29,11 +29,11 @@ if ( isset( $_POST['s2_admin'] ) ) {
 	$subscriber = ! empty( $_REQUEST['subscriber'] ) ? sanitize_text_field( $_REQUEST['subscriber'] ) : '';
 
 	$s2_request_category = '';
-	if ( isset( $_REQUEST['category'] ) && $_REQUEST['category'] ) {
-		$s2_request_category = $_REQUEST['category'];
+	if ( ! empty( $_REQUEST['category'] ) ) {
+		$s2_request_category = sanitize_key( $_REQUEST['category'] );
 	}
 
-	if ( false === wp_verify_nonce( $_REQUEST['_wpnonce'], 'bulk-' . $s2_list_table->_args['plural'] ) ) {
+	if ( false === wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'bulk-' . $s2_list_table->_args['plural'] ) ) {
 		die( '<p>' . esc_html__( 'Security error! Your request cannot be completed.', 'subscribe2' ) . '</p>' );
 	}
 
@@ -94,7 +94,7 @@ if ( isset( $_POST['s2_admin'] ) ) {
 	} elseif ( isset( $_POST['remind'] ) ) {
 		$this->remind( $_POST['reminderemails'] );
 		echo '<div id="message" class="updated fade"><p><strong>' . esc_html__( 'Reminder Email(s) Sent!', 'subscribe2' ) . '</strong></p></div>';
-	} elseif ( isset( $_POST['sub_categories'] ) && 'subscribe' === ( isset( $_POST['manage'] ) ? $_POST['manage'] : '' ) ) {
+	} elseif ( isset( $_POST['sub_categories'] ) && 'subscribe' === ( isset( $_POST['manage'] ) ? sanitize_key( $_POST['manage'] ) : '' ) ) {
 		if ( ! empty( $subscriber ) ) {
 			$this->subscribe_registered_users( implode( ",\r\n", $subscriber ), $s2_request_category );
 		} else {
@@ -102,7 +102,7 @@ if ( isset( $_POST['s2_admin'] ) ) {
 		}
 
 		echo '<div id="message" class="updated fade"><p><strong>' . esc_html__( 'Registered Users Subscribed!', 'subscribe2' ) . '</strong></p></div>';
-	} elseif ( isset( $_POST['sub_categories'] ) && 'unsubscribe' === ( isset( $_POST['manage'] ) ? $_POST['manage'] : '' ) ) {
+	} elseif ( isset( $_POST['sub_categories'] ) && 'unsubscribe' === ( isset( $_POST['manage'] ) ? sanitize_key( $_POST['manage'] ) : '' ) ) {
 		if ( ! empty( $subscriber ) ) {
 			$this->unsubscribe_registered_users( implode( ",\r\n", $subscriber ), $s2_request_category );
 		} else {
@@ -189,13 +189,13 @@ if ( ! empty( $_POST['s'] ) ) {
 	$result = array();
 	if ( 'registered' === $current_tab ) {
 		foreach ( $subscribers as $subscriber ) {
-			if ( is_numeric( stripos( $subscriber['user_email'], $_POST['s'] ) ) ) {
+			if ( is_numeric( stripos( $subscriber['user_email'], sanitize_key( $_POST['s'] ) ) ) ) {
 				$result[] = $subscriber;
 			}
 		}
 	} else {
 		foreach ( $subscribers as $subscriber ) {
-			if ( is_numeric( stripos( $subscriber, $_POST['s'] ) ) ) {
+			if ( is_numeric( stripos( $subscriber, sanitize_key( $_POST['s'] ) ) ) ) {
 				$result[] = $subscriber;
 			}
 		}
@@ -318,7 +318,7 @@ if ( 'registered' === $current_tab ) {
 	if ( 'never' === $this->subscribe2_options['email_freq'] ) {
 		$manage     = ! empty( $_POST['manage'] ) ? sanitize_text_field( $_POST['manage'] ) : '';
 		$format     = ! empty( $_POST['format'] ) ? sanitize_text_field( $_POST['format'] ) : '';
-		$categories = ! empty( $_POST['category'] ) ? map_deep( $_POST['category'], 'sanitize_text_field' ) : array();
+		$categories = ! empty( $_POST['category'] ) ? array_map( 'sanitize_key', $_POST['category'] ) : array();
 
 		echo esc_html__( 'Preferences for Registered Users selected above can be changed using this section.', 'subscribe2' ) . '<br>' . "\r\n";
 		echo '<strong><em style="color: red">' . esc_html__( 'Consider User Privacy as changes cannot be undone', 'subscribe2' ) . '</em></strong><br>' . "\r\n";
@@ -340,7 +340,7 @@ if ( 'registered' === $current_tab ) {
 		echo '<label><input type="radio" name="format" value="excerpt"' . checked( $format, 'excerpt', false ) . '/> ' . esc_html__( 'Plain Text - Excerpt', 'subscribe2' ) . '</label>' . "\r\n";
 		echo '<p class="submit"><button class="button-primary" name="sub_format" onclick="return bmCheck();">' . esc_html__( 'Bulk Update Format', 'subscribe2' ) . '</button></p>';
 	} else {
-		$sub_cats = ! empty( $_POST['sub_category'] ) ? sanitize_text_field( $_POST['sub_category'] ) : '';
+		$sub_cats = ! empty( $_POST['sub_category'] ) ? sanitize_key( $_POST['sub_category'] ) : '';
 
 		echo esc_html__( 'Preferences for Registered Users selected above can be changed using this section.', 'subscribe2' ) . "<br>\r\n";
 		echo '<strong><em style="color: red">' . esc_html__( 'Consider User Privacy as changes cannot be undone.', 'subscribe2' ) . '</em></strong><br>' . "\r\n";

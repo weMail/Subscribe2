@@ -248,7 +248,7 @@ class S2_List_Table extends WP_List_Table {
 			return;
 		}
 
-		if ( empty( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'bulk-subscribers' ) ) {
+		if ( empty( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'bulk-subscribers' ) ) {
 			echo '<div id="message" class="error"><p><strong>' . __( 'Error: Nonce verification failed.', 'subscribe2' ) . '</strong></p></div>';
 			return;
 		}
@@ -299,7 +299,7 @@ class S2_List_Table extends WP_List_Table {
 			foreach ( $_REQUEST['subscriber'] as $address ) {
 				$address = trim( stripslashes( $address ) );
 				$mysubscribe2->toggle( $address );
-				if ( 'confirmed' === $_POST['what'] || 'unconfirmed' === $_POST['what'] ) {
+				if ( 'confirmed' === sanitize_text_field( $_POST['what'] ) || 'unconfirmed' === sanitize_text_field( $_POST['what'] ) ) {
 					$key = array_search( $address, $subscribers, true );
 					unset( $subscribers[ $key ] );
 				}
@@ -348,7 +348,7 @@ class S2_List_Table extends WP_List_Table {
 		if ( isset( $_REQUEST['what'] ) ) {
 			$current_url = add_query_arg(
 				array(
-					'what' => $_REQUEST['what'],
+					'what' => sanitize_text_field( $_REQUEST['what'] ),
 				),
 				$current_url
 			);
@@ -357,7 +357,7 @@ class S2_List_Table extends WP_List_Table {
 		if ( isset( $_POST['s'] ) ) {
 			$current_url = add_query_arg(
 				array(
-					's' => $_POST['s'],
+					's' => sanitize_key( $_POST['s'] ),
 				),
 				$current_url
 			);

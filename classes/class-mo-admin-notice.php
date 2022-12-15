@@ -23,7 +23,7 @@ if ( ! class_exists( 'MO_Admin_Notice' ) ) {
 		 * @return void
 		 */
 		public function dismiss_admin_notice() {
-			if ( empty( $_GET['mo-adaction'] ) || 'mo_dismiss_adnotice' !== $_GET['mo-adaction'] ) {
+			if ( empty( $_GET['mo-adaction'] ) || 'mo_dismiss_adnotice' !== sanitize_key( $_GET['mo-adaction'] ) ) {
 				return;
 			}
 
@@ -42,7 +42,7 @@ if ( ! class_exists( 'MO_Admin_Notice' ) ) {
 		public function admin_notice() {
 			global $pagenow;
 
-			if ( 'index.php' === $pagenow || ( isset( $_GET['page'] ) && false !== strpos( $_GET['page'], 's2_' ) ) ) {
+			if ( 'index.php' === $pagenow || ( isset( $_GET['page'] ) && false !== strpos( sanitize_key( $_GET['page'] ), 's2_' ) ) ) {
 				if ( get_option( 'mo_dismiss_adnotice', 'false' ) === 'true' ) {
 					return;
 				}
@@ -84,12 +84,12 @@ if ( ! class_exists( 'MO_Admin_Notice' ) ) {
 					</div>
 					<div class="mo-notice-other-half">
 						<?php if ( ! $this->is_plugin_installed() ) : ?>
-							<a class="button button-primary button-hero" id="mo-install-mailoptin-plugin" href="<?php echo esc_attr( $install_url ); ?>">
+							<a class="button button-primary button-hero" id="mo-install-mailoptin-plugin" href="<?php echo esc_url( $install_url ); ?>">
 								<?php esc_html_e( 'Install weMail Now for Free!', 'subscribe2' ); ?>
 							</a>
 						<?php endif; ?>
 						<?php if ( $this->is_plugin_installed() && ! $this->is_plugin_active() ) : ?>
-							<a class="button button-primary button-hero" id="mo-activate-mailoptin-plugin" href="<?php echo esc_attr( $activate_url ); ?>">
+							<a class="button button-primary button-hero" id="mo-activate-mailoptin-plugin" href="<?php echo esc_url( $activate_url ); ?>">
 								<?php esc_html_e( 'Activate weMail Now!', 'subscribe2' ); ?>
 							</a>
 						<?php endif; ?>
@@ -97,7 +97,7 @@ if ( ! class_exists( 'MO_Admin_Notice' ) ) {
 							<a target="_blank" href="https://getwemail.io"><?php esc_html_e( 'Learn more', 'subscribe2' ); ?></a>
 						</div>
 					</div>
-					<a href="<?php echo esc_attr( $dismiss_url ); ?>">
+					<a href="<?php echo esc_url( $dismiss_url ); ?>">
 						<button type="button" class="notice-dismiss">
 							<span class="screen-reader-text"><?php esc_html_e( 'Dismiss this notice', 'subscribe2' ); ?>.</span>
 						</button>

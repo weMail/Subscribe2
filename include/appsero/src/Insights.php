@@ -400,14 +400,14 @@ class Insights {
      */
     public function handle_optin_optout() {
 
-        if ( isset( $_GET[ $this->client->slug . '_tracker_optin' ] ) && $_GET[ $this->client->slug . '_tracker_optin' ] == 'true' ) {
+        if ( isset( $_GET[ $this->client->slug . '_tracker_optin' ] ) && sanitize_key( $_GET[ $this->client->slug . '_tracker_optin' ] ) === 'true' ) {
             $this->optin();
 
             wp_redirect( remove_query_arg( $this->client->slug . '_tracker_optin' ) );
             exit;
         }
 
-        if ( isset( $_GET[ $this->client->slug . '_tracker_optout' ] ) && $_GET[ $this->client->slug . '_tracker_optout' ] == 'true' ) {
+        if ( isset( $_GET[ $this->client->slug . '_tracker_optout' ] ) && sanitize_key( $_GET[ $this->client->slug . '_tracker_optout' ] ) === 'true' ) {
             $this->optout();
 
             wp_redirect( remove_query_arg( $this->client->slug . '_tracker_optout' ) );
@@ -703,6 +703,14 @@ class Insights {
         if ( ! isset( $_POST['reason_id'] ) ) {
             wp_send_json_error();
         }
+
+	    if ( ! wp_verify_nonce( $_POST['nonce'], 'appsero-security-nonce' ) ) {
+		    wp_send_json_error( 'Nonce verification failed' );
+	    }
+
+	    if ( ! current_user_can( 'manage_options' ) ) {
+		    wp_send_json_error( 'You are not allowed for this task' );
+	    }
 
         $current_user = wp_get_current_user();
 

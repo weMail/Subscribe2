@@ -676,7 +676,7 @@ class License {
      */
     private function formActionUrl() {
         echo add_query_arg(
-            array( 'page' => $_GET['page'] ),
+            array( 'page' => sanitize_key( $_GET['page'] ) ),
             admin_url( basename( $_SERVER['SCRIPT_NAME'] ) )
         );
     }

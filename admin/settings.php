@@ -7,7 +7,7 @@ global $wpdb, $current_tab;
 
 // was anything POSTed?
 if ( isset( $_POST['s2_admin'] ) ) {
-	if ( false === wp_verify_nonce( $_REQUEST['_wpnonce'], 'subscribe2-options_subscribers' . S2VERSION ) ) {
+	if ( false === wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'subscribe2-options_subscribers' . S2VERSION ) ) {
 		die( '<p>' . esc_html__( 'Security error! Your request cannot be completed.', 'subscribe2' ) . '</p>' );
 	}
 
@@ -46,12 +46,12 @@ if ( isset( $_POST['s2_admin'] ) ) {
 		foreach ( $_POST as $key => $value ) {
 			if ( in_array( $key, array( 'bcclimit', 's2page', 's2_unsub_page' ), true ) ) {
 				// Numerical inputs fixed for old option names.
-				if ( is_numeric( $_POST[ $key ] ) && $_POST[ $key ] >= 0 ) {
-					$this->subscribe2_options[ $key ] = (int) $_POST[ $key ];
+				if ( is_numeric( $_POST[ $key ] ) && intval( $_POST[ $key ] ) >= 0 ) {
+					$this->subscribe2_options[ $key ] = intval( $_POST[ $key ] );
 				}
 			} elseif ( in_array( $key, array( 'show_meta', 'show_button', 'ajax', 'widget', 'counterwidget', 's2meta_default', 'reg_override' ), true ) ) {
 				// Check box entries.
-				$this->subscribe2_options[ $key ] = ( isset( $_POST[ $key ] ) && '1' === $_POST[ $key ] ) ? '1' : '0';
+				$this->subscribe2_options[ $key ] = ( isset( $_POST[ $key ] ) && '1' === sanitize_key( $_POST[ $key ] ) ) ? '1' : '0';
 			} elseif ( 'appearance_tab' === $key ) {
 				$options = array( 'show_meta', 'show_button', 'ajax', 'widget', 'counterwidget', 's2meta_default', 'js_ip_updater', 's2_unsub_page' );
 				foreach ( $options as $option ) {
@@ -61,11 +61,11 @@ if ( isset( $_POST['s2_admin'] ) ) {
 				}
 			} elseif ( in_array( $key, array( 'notification_subject', 'mailtext', 'confirm_subject', 'confirm_email', 'remind_subject', 'remind_email' ), true ) && ! empty( $_POST[ $key ] ) ) {
 				// Email subject and body templates.
-				$this->subscribe2_options[ $key ] = trim( $_POST[ $key ] );
+				$this->subscribe2_options[ $key ] = sanitize_text_field( trim( $_POST[ $key ] ) );
 			} elseif ( in_array( $key, array( 'compulsory', 'exclude', 'format' ), true ) ) {
 				sort( $_POST[ $key ] );
 
-				$newvalue = implode( ',', $_POST[ $key ] );
+				$newvalue = implode( ',', array_map( 'sanitize_text_field', $_POST[ $key ] ) );
 				if ( 'format' === $key ) {
 					$this->subscribe2_options['exclude_formats'] = $newvalue;
 				} else {
@@ -88,7 +88,7 @@ if ( isset( $_POST['s2_admin'] ) ) {
 				$scheduled_time   = wp_next_scheduled( 's2_digest_cron' );
 				$timestamp_offset = get_option( 'gmt_offset' ) * 60 * 60;
 				$crondate         = ! empty( $_POST['crondate'] ) ? sanitize_text_field( $_POST['crondate'] ) : 0;
-				$crontime         = ! empty( $_POST['crondate'] ) ? sanitize_text_field( $_POST['crontime'] ) : 0;
+				$crontime         = ! empty( $_POST['crontime'] ) ? sanitize_text_field( $_POST['crontime'] ) : 0;
 
 				if ( $email_freq !== $this->subscribe2_options['email_freq'] || date_i18n( get_option( 'date_format' ), $scheduled_time + $timestamp_offset ) !== $crondate || gmdate( 'G', $scheduled_time + $timestamp_offset ) !== $crontime ) {
 					$this->subscribe2_options['email_freq'] = $email_freq;
@@ -96,7 +96,7 @@ if ( isset( $_POST['s2_admin'] ) ) {
 					wp_clear_scheduled_hook( 's2_digest_cron' );
 
 					$schedules = (array) wp_get_schedules();
-					$interval  = ! empty( $schedules[ $email_freq ]['interval'] ) ? (int) $schedules[ $email_freq ]['interval'] : 0;
+					$interval  = ! empty( $schedules[ $email_freq ]['interval'] ) ? intval( $schedules[ $email_freq ]['interval'] ) : 0;
 					if ( 0 === $interval ) {
 						// If we are on per-post emails remove last_cron entry.
 						unset( $this->subscribe2_options['last_s2cron'] );
@@ -119,11 +119,11 @@ if ( isset( $_POST['s2_admin'] ) ) {
 				}
 			} else {
 				if ( isset( $this->subscribe2_options[ $key ] ) ) {
-					if ( 'sender' === $key && $this->subscribe2_options[ $key ] !== $_POST[ $key ] ) {
+					if ( 'sender' === $key && $this->subscribe2_options[ $key ] !== sanitize_text_field( $_POST[ $key ] ) ) {
 						$this->subscribe2_options['dismiss_sender_warning'] = '0';
 					}
 
-					$this->subscribe2_options[ $key ] = $_POST[ $key ];
+					$this->subscribe2_options[ $key ] = sanitize_text_field( $_POST[ $key ] );
 				}
 			}
 		}
@@ -195,7 +195,7 @@ if (
 }
 
 // Detect or define which tab we are in.
-$current_tab = ! empty( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'email';
+$current_tab = ! empty( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'email';
 
 // Show our form.
 echo '<div class="wrap">';
@@ -213,7 +213,7 @@ echo '<h2 class="nav-tab-wrapper">';
 
 foreach ( $s2tabs as $tab_key => $tab_caption ) {
 	$active = ( $current_tab === $tab_key ) ? 'nav-tab-active' : '';
-	echo '<a class="nav-tab ' . esc_attr( $active ) . '" href="?page=s2_settings&amp;tab=' . esc_html( $tab_key ) . '">' . esc_html( $tab_caption ) . '</a>';
+	echo '<a class="nav-tab ' . esc_attr( $active ) . '" href="?page=s2_settings&amp;tab=' . esc_url( $tab_key ) . '">' . esc_html( $tab_caption ) . '</a>';
 }
 
 echo '</h2>';
@@ -274,7 +274,7 @@ switch ( $current_tab ) {
 		echo esc_html__( 'No', 'subscribe2' ) . '</label><br><br>' . "\r\n";
 
 		$s2_post_types = apply_filters( 's2_post_types', array() );
-		if ( ! empty( $s2_post_types ) && ! empty( $s2_post_types ) ) {
+		if ( ! empty( $s2_post_types ) ) {
 			echo esc_html__( 'Subscribe2 will send email notifications for the following custom post types', 'subscribe2' ) . ': ';
 			echo '<strong>' . esc_html( implode( ', ', $s2_post_types ) ) . '</strong><br><br>' . "\r\n";
 		}

@@ -474,7 +474,7 @@ class S2_Core {
 		if ( empty( $preview ) ) {
 			// We aren't sending a Preview to the current user so carry out checks.
 			$s2mail = get_post_meta( $post->ID, '_s2mail', true );
-			if ( ( isset( $_POST['s2_meta_field'] ) && 'no' === $_POST['s2_meta_field'] ) || 'no' === strtolower( trim( $s2mail ) ) ) {
+			if ( ( isset( $_POST['s2_meta_field'] ) && 'no' === sanitize_key( $_POST['s2_meta_field'] ) ) || 'no' === strtolower( trim( $s2mail ) ) ) {
 				return $post;
 			}
 
@@ -1574,7 +1574,7 @@ class S2_Core {
 
 		if (
 			'yes' === $this->subscribe2_options['autosub'] ||
-			( isset( $_POST['reg_subscribe'] ) && 'on' === $_POST['reg_subscribe'] && 'wpreg' === $this->subscribe2_options['autosub'] )
+			( isset( $_POST['reg_subscribe'] ) && 'on' === sanitize_key( $_POST['reg_subscribe'] ) && 'wpreg' === $this->subscribe2_options['autosub'] )
 		) {
 			$this->register( $user_ID, true );
 		} else {
@@ -1613,11 +1613,11 @@ class S2_Core {
 			return;
 		}
 
-		if ( isset( $_POST['s2_comment_request'] ) && '1' === $_POST['s2_comment_request'] ) {
+		if ( isset( $_POST['s2_comment_request'] ) && '1' === sanitize_key( $_POST['s2_comment_request'] ) ) {
 			switch ( $approved ) {
 				case '0':
 					// Unapproved so hold in meta data pending moderation.
-					add_comment_meta( $comment_id, 's2_comment_request', $_POST['s2_comment_request'] );
+					add_comment_meta( $comment_id, 's2_comment_request', sanitize_key( $_POST['s2_comment_request'] ) );
 					break;
 				case '1':
 					// Approved so add.
@@ -2378,7 +2378,7 @@ class S2_Core {
 				header( 'Pragma: no-cache' );
 				header( 'Expires: 0' );
 
-				echo esc_html( $this->prepare_export( $_POST['exportcsv'] ) );
+				echo esc_html( $this->prepare_export( sanitize_text_field( $_POST['exportcsv'] ) ) );
 				exit( 0 );
 			}
 		} else {
