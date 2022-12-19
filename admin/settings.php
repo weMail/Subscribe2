@@ -226,14 +226,14 @@ echo '<input type="hidden" id="jsbcclimit" value="' . esc_attr( $this->subscribe
 
 $default_text = sprintf(
 	/* translators: Placeholders: %1$s - opening strong tag, %2$s closing strong tag */
-	__( 'Restrict the number of %1$recipients per email%2$s to (0 for unlimited).', 'subscribe2' ),
+	__( 'Restrict the number of %1$srecipients per email%2$s to (0 for unlimited).', 'subscribe2' ),
 	'<strong>',
 	'</strong>'
 );
 
 $restriction_msg = sprintf(
 	/* translators: Placeholders: %1$s - opening strong tag, %2$s closing strong tag */
-	__( 'Restrict the number of %1$recipients per email%2$s to (0 for unlimited).', 'subscribe2' ),
+	__( 'Restrict the number of %1$srecipients per email%2$s to (0 for unlimited).', 'subscribe2' ),
 	'<strong>',
 	'</strong>'
 );
@@ -414,7 +414,7 @@ switch ( $current_tab ) {
 
 		$s2_forms->display_category_form( explode( ',', $this->subscribe2_options['exclude'] ), 1, array(), 'exclude' );
 
-		echo '<p style="margin-top: 20px;"><label><input type="checkbox" name="reg_override" value="1"' . checked( $this->subscribe2_options['reg_override'], '1', false ) . ' /> ';
+		echo '<p style="text-align: center;"><label><input type="checkbox" name="reg_override" value="1"' . checked( $this->subscribe2_options['reg_override'], '1', false ) . ' /> ';
 		echo esc_html__( 'Allow registered users to subscribe to excluded categories?', 'subscribe2' ) . '</label></p>' . "\r\n";
 		echo '</div>' . "\r\n";
 
