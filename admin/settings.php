@@ -592,7 +592,7 @@ switch ( $current_tab ) {
 }
 
 // Submit settings.
-submit_button( __( 'Submit', 'subscribe2' ) );
+submit_button( __( 'Submit', 'subscribe2' ), 'primary', 'submit' , true, 'style="display: block; margin: 0 auto;"' );
 
 if ( 'misc' === $current_tab ) {
 	// Reset.

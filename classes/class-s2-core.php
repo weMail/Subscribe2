@@ -393,6 +393,10 @@ class S2_Core {
      * @return string|string[]
      */
 	public function parse_unsubscribe_link( $content, $recipient ) {
+		if ( empty( $this->subscribe2_options['s2_unsub_page'] ) ) {
+			return str_replace('{UNSUBLINK}', '', $content );
+		}
+
 	    $page_url  = get_page_link( $this->subscribe2_options['s2_unsub_page'] );
 	    $query     = parse_url( $page_url, PHP_URL_QUERY );
 	    $page_url .= ( ( $query ? '&' : '?' ) . 's2_unsub=' . base64_encode( $recipient ) );
