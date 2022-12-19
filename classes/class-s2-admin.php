@@ -377,7 +377,7 @@ class S2_Admin extends S2_Core {
 
 		if (
 			! in_array( $pagenow, array( 'post-new.php', 'post.php', 'page-new.php', 'page.php' ), true ) &&
-			! strpos( esc_url( $_SERVER['REQUEST_URI'] ), 'page=s2_posts' )
+			false !== strpos( esc_url( $_SERVER['REQUEST_URI'] ), 'page=s2_posts' )
 		) {
 			return;
 		}

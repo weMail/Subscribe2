@@ -200,7 +200,7 @@ trait Shortcode {
 			} else {
 				$this->ip = $_POST['ip'];
 				if ( is_int( $this->lockout ) && $this->lockout > 0 ) {
-					$date = gmdate( 'H:i:s.u', $this->lockout );
+					$date = current_datetime( $this->lockout )->format( 'H:i:s.u' );
 					$ips  = $wpdb->get_col(
 						$wpdb->prepare(
 							"SELECT ip FROM $wpdb->subscribe2 WHERE date = CURDATE() AND time > SUBTIME(CURTIME(), %s)",

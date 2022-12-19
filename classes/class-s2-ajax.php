@@ -119,12 +119,9 @@ class S2_Ajax {
 			wp_die();
 		}
 
+
 		$data = ! empty( $_POST['data'] ) ? array_map( 'sanitize_text_field', $_POST['data'] ) : array();
-		if (
-			( isset( $data['firstname'] ) && ! empty( $data['firstname'] ) ) ||
-			( isset( $data['lastname'] ) && ! empty( $data['lastname'] ) ) ||
-			( isset( $data['uri'] ) && 'http://' !== $data['uri'] )
-		) {
+		if ( ! empty( $data['firstname'] ) || ! empty( $data['lastname'] ) || ( isset( $data['uri'] ) && 'http://' !== $data['uri'] ) ) {
 			// Looks like some invisible-to-user fields were changed, falsely report success.
 			echo '<p>' . esc_html__( 'A confirmation message is on its way!', 'subscribe2' ) . '</p>';
 			wp_die();
