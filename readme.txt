@@ -72,7 +72,7 @@ This token will automatically be replaced by dynamic subscription information an
 
 == Changelog ==
 
-= 10.38 (9th December, 2022) =
+= 10.38 (21st December, 2022) =
 
  * Fix security related issues & also make compatible with wp v6.1.1
 
