@@ -541,7 +541,7 @@ class S2_Admin extends S2_Core {
 		}
 
 		$subscribe_meta_field = ! empty( $_POST['s2_meta_field'] ) ? sanitize_text_field( $_POST['s2_meta_field'] ) : 'no';
-		if ( ! emtpy( $subscribe_meta_field ) && 'no' === $subscribe_meta_field ) {
+		if ( ! empty( $subscribe_meta_field ) && 'no' === $subscribe_meta_field ) {
 			update_post_meta( $post_id, '_s2mail', $subscribe_meta_field );
 		} else {
 			update_post_meta( $post_id, '_s2mail', 'yes' );
