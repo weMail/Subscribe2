@@ -181,7 +181,7 @@ trait Shortcode {
 
 		// Anti spam sign up measure.
 		if ( isset( $_POST['subscribe'] ) || isset( $_POST['unsubscribe'] ) ) {
-			if ( ! empty( $_POST['firstname'] ) || ! empty( $_POST['lastname'] ) || ( ! emtpy( $_POST['uri'] ) && 'http://' !== sanitize_url( $_POST['uri'] ) ) ) {
+			if ( ! empty( $_POST['firstname'] ) || ! empty( $_POST['lastname'] ) || ( ! empty( $_POST['uri'] ) && 'http://' !== sanitize_url( $_POST['uri'] ) ) ) {
 				// Looks like some invisible-to-user fields were changed; falsely report success.
 				return $this->confirmation_sent;
 			}
