@@ -157,9 +157,7 @@ class S2_Core {
 
 		if ( strstr( $string, '{TINYLINK}' ) ) {
 			$response = wp_safe_remote_get( 'http://tinyurl.com/api-create.php?url=' . rawurlencode( $this->get_tracking_link( $this->permalink ) ) );
-			if ( ! is_wp_error( $response ) ) {
-				$tinylink = wp_remote_retrieve_body( $response );
-			}
+			$tinylink = ! is_wp_error( $response ) ? wp_remote_retrieve_body( $response ) : '';
 
 			if ( false !== $tinylink ) {
 				$tlink  = '<a href="' . $tinylink . '">' . $tinylink . '</a>';
