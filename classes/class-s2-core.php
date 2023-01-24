@@ -157,9 +157,7 @@ class S2_Core {
 
 		if ( strstr( $string, '{TINYLINK}' ) ) {
 			$response = wp_safe_remote_get( 'http://tinyurl.com/api-create.php?url=' . rawurlencode( $this->get_tracking_link( $this->permalink ) ) );
-			if ( ! is_wp_error( $response ) ) {
-				$tinylink = wp_remote_retrieve_body( $response );
-			}
+			$tinylink = ! is_wp_error( $response ) ? wp_remote_retrieve_body( $response ) : '';
 
 			if ( false !== $tinylink ) {
 				$tlink  = '<a href="' . $tinylink . '">' . $tinylink . '</a>';
@@ -2204,7 +2202,7 @@ class S2_Core {
 		}
 
 		// Load our translations.
-		add_action( 'init', array( &$this, 'load_translations' ) );
+		add_action( 'init', array( $this, 'load_translations' ) );
 
 		// Define and register table name.
 		$s2_table = $wpdb->prefix . 'subscribe2';
@@ -2270,25 +2268,25 @@ class S2_Core {
 
 		// Add actions for comment subscribers.
 		if ( 'no' !== $this->subscribe2_options['comment_subs'] ) {
-			add_filter( 'jetpack_get_available_modules', array( &$this, 's2_hide_jetpack_comments' ) );
-			add_filter( 'comment_form_submit_field', array( &$this, 's2_comment_meta_form' ) );
-			add_action( 'comment_post', array( &$this, 's2_comment_meta' ), 1, 2 );
-			add_action( 'wp_set_comment_status', array( &$this, 'comment_status' ) );
+			add_filter( 'jetpack_get_available_modules', array( $this, 's2_hide_jetpack_comments' ) );
+			add_filter( 'comment_form_submit_field', array( $this, 's2_comment_meta_form' ) );
+			add_action( 'comment_post', array( $this, 's2_comment_meta' ), 1, 2 );
+			add_action( 'wp_set_comment_status', array( $this, 'comment_status' ) );
 		}
 
 		// Add action to display widget if option is enabled.
 		if ( '1' === $this->subscribe2_options['widget'] ) {
-			add_action( 'widgets_init', array( &$this, 'subscribe2_widget' ) );
+			add_action( 'widgets_init', array( $this, 'subscribe2_widget' ) );
 		}
 
 		// Add action to display counter widget if option is enabled.
 		if ( '1' === $this->subscribe2_options['counterwidget'] ) {
-			add_action( 'widgets_init', array( &$this, 'counter_widget' ) );
+			add_action( 'widgets_init', array( $this, 'counter_widget' ) );
 		}
 
 		// Add action to 'clean' unconfirmed Public Subscribers.
 		if ( is_int( $this->clean_interval ) && $this->clean_interval > 0 ) {
-			add_action( 'wp_scheduled_delete', array( &$this, 's2cleaner_task' ) );
+			add_action( 'wp_scheduled_delete', array( $this, 's2cleaner_task' ) );
 		}
 
 		// Add ajax class if enabled.

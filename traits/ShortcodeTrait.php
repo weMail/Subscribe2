@@ -59,7 +59,7 @@ trait Shortcode {
         $this->unsubscribe = __( 'unsubscribe', 'subscribe2' ); //ACTION replacement in unsubscribing in confirmation email
 
         if ( ! empty( $_GET['s2_unsub'] ) ) {
-            $this->unsubscribe( sanitize_email( $_GET['s2_unsub'] ) );
+	        $this->unsubscribe( sanitize_email( base64_decode( $_GET['s2_unsub'] ) ) );
         }
     }
 

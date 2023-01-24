@@ -13,7 +13,6 @@ class S2_Frontend extends S2_Core {
 	public function unsubscribe( $email ) {
 	    global $wpdb;
 
-        $email = base64_decode( $email );
         if ( ! filter_var( $email, FILTER_VALIDATE_EMAIL ) ) {
             return;
         }
