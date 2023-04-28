@@ -33,7 +33,7 @@ if ( isset( $_POST['s2_admin'] ) ) {
 		$s2_request_category = sanitize_key( $_REQUEST['category'] );
 	}
 
-	if ( false === wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'bulk-' . $s2_list_table->_args['plural'] ) ) {
+	if ( ! isset( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'bulk-' . $s2_list_table->_args['plural'] ) ) {
 		die( '<p>' . esc_html__( 'Security error! Your request cannot be completed.', 'subscribe2' ) . '</p>' );
 	}
 
