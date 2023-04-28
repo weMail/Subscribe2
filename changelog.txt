@@ -1,3 +1,7 @@
+= 10.41 (28th April, 2023) =
+
+* Fix: CSRF, Authorization issues when send an email.
+
 = 10.40 (24th January, 2023) =
 
 * Fix: {UNSUBLINK} tag not working properly when send an email.

@@ -7,7 +7,7 @@ global $wpdb, $current_tab;
 
 // was anything POSTed?
 if ( isset( $_POST['s2_admin'] ) ) {
-	if ( false === wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'subscribe2-options_subscribers' . S2VERSION ) ) {
+	if ( ! isset( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'subscribe2-options_subscribers' . S2VERSION ) ) {
 		die( '<p>' . esc_html__( 'Security error! Your request cannot be completed.', 'subscribe2' ) . '</p>' );
 	}
 

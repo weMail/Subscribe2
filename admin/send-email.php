@@ -9,7 +9,11 @@ $s2_admin = ! empty( $_POST['s2_admin'] ) ? sanitize_key( $_POST['s2_admin'] ) :
 
 // was anything POSTed?
 if ( 'mail' === $s2_admin ) {
-	if ( isset( $_REQUEST['_wpnonce'] ) && ! wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'subscribe2-write_subscribers' . S2VERSION ) ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		die( '<p>' . esc_html__( 'Security error! You are not able to send email.', 'subscribe2' ) . '</p>' );
+	}
+
+	if ( ! isset( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'subscribe2-write_subscribers' . S2VERSION ) ) {
 		die( '<p>' . esc_html__( 'Security error! Your request cannot be completed.', 'subscribe2' ) . '</p>' );
 	}
 
