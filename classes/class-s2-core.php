@@ -1272,7 +1272,7 @@ class S2_Core {
 	 */
 	public function sanitize_email( $email ) {
 		$email = trim( stripslashes( $email ) );
-		if ( false === $email ) {
+		if ( empty( $email ) ) {
 			return false;
 		}
 
