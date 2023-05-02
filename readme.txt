@@ -75,6 +75,7 @@ This token will automatically be replaced by dynamic subscription information an
 = 10.41 (28th April, 2023) =
 
 * Fix: CSRF, Authorization issues when send an email.
+* Fix: Use built-in sanitize_email instead of manual.
 
 = 10.40 (24th January, 2023) =
 
