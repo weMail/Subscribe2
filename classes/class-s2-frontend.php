@@ -115,7 +115,7 @@ class S2_Frontend extends S2_Core {
 		$id     = intval( substr( $code, 33 ) );
 
 		if ( $id ) {
-			$this->email = $this->sanitize_email( $this->get_email( $id ) );
+			$this->email = sanitize_email( $this->get_email( $id ) );
 			if ( ! $this->email || wp_hash( $this->email ) !== $hash ) {
 				return $this->no_such_email;
 			}

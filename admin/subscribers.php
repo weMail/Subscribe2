@@ -40,7 +40,7 @@ if ( isset( $_POST['s2_admin'] ) ) {
 	if ( ! empty( $_POST['addresses'] ) ) {
 		$reg_sub_error = $pub_sub_error = $unsub_error = $email_error = $message = '';
 		foreach ( preg_split( '/[\s,]+/', $_POST['addresses'] ) as $email ) {
-			$clean_email = $this->sanitize_email( $email );
+			$clean_email = sanitize_email( $email );
 			if ( false === $this->validate_email( $clean_email ) ) {
 				$email_error .= empty( $email_error ) ? $email : ", $email";
 				continue;

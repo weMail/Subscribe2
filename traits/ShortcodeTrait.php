@@ -135,7 +135,7 @@ trait Shortcode {
 		}
 
 		// Allow remote setting of email in form.
-		$email = ! empty( $_REQUEST['email'] ) ? $this->sanitize_email( $_REQUEST['email'] ) : '';
+		$email = ! empty( $_REQUEST['email'] ) ? sanitize_email( $_REQUEST['email'] ) : '';
 		if ( ! empty( $email ) && false !== $this->validate_email( $email ) ) {
 			$value = $email;
 		} elseif ( 'true' === strtolower( $args['nojs'] ) ) {
@@ -192,7 +192,7 @@ trait Shortcode {
 			}
 
 			global $wpdb;
-			$this->email = $this->sanitize_email( $_POST['email'] );
+			$this->email = sanitize_email( $_POST['email'] );
 			if ( false === $this->validate_email( $this->email ) ) {
 				$this->s2form = $this->s2form . $this->not_an_email;
 			} elseif ( $this->is_barred( $this->email ) ) {

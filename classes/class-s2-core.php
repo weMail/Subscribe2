@@ -1264,24 +1264,6 @@ class S2_Core {
 	}
 
 	/**
-	 * Function to ensure email is compliant with internet messaging standards.
-	 *
-	 * @param string $email
-	 *
-	 * @return bool
-	 */
-	public function sanitize_email( $email ) {
-		$email = trim( stripslashes( $email ) );
-		if ( empty( $email ) ) {
-			return false;
-		}
-
-		// Ensure that domain is in lowercase as per internet email standards http://www.ietf.org/rfc/rfc5321.txt.
-		list( $name, $domain ) = explode( '@', $email, 2 );
-		return apply_filters( 's2_sanitize_email', $name . '@' . strtolower( $domain ), $email );
-	}
-
-	/**
 	 * Check email is valid.
 	 *
 	 * @param string $email
@@ -1348,7 +1330,7 @@ class S2_Core {
 		}
 
 		// Has this user previously signed up for email notification?
-		if ( false !== $this->is_public( $this->sanitize_email( $user->user_email ) ) ) {
+		if ( false !== $this->is_public( sanitize_email( $user->user_email ) ) ) {
 			// Delete this user from the public table, and subscribe them to all the categories.
 			$this->delete( $user->user_email );
 			update_user_meta( $user_ID, $this->get_usermeta_keyname( 's2_subscribed' ), $cats );
