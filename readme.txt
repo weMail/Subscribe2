@@ -72,7 +72,7 @@ This token will automatically be replaced by dynamic subscription information an
 
 == Changelog ==
 
-= 10.41 (28th April, 2023) =
+= 10.41 (23rd June, 2023) =
 
 * Fix: CSRF, Authorization issues when send an email.
 * Fix: Use built-in sanitize_email instead of manual.
