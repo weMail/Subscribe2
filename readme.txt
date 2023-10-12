@@ -72,9 +72,10 @@ This token will automatically be replaced by dynamic subscription information an
 
 == Changelog ==
 
-= 10.42 (1st August, 2023) =
+= 10.42 (12th October, 2023) =
 
 * Fix: Subscribers searching filter can't search by email address.
+* Fix: Post notification email is not sending to public subscribers.
 
 = 10.41 (23rd June, 2023) =
 
