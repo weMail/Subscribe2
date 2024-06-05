@@ -467,7 +467,7 @@ class Insights
         $notice .= sprintf( $this->client->__trans('We are using Appsero to collect your data. <a href="%1$s" target="_blank">Learn more</a> about how Appsero collects and handle your data.</p>' ), esc_url( $policy_url ) );
 
         echo '<div class="updated"><p>';
-        echo $notice;
+        echo $notice; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         echo '</p><p class="submit">';
         echo '&nbsp;<a href="' . esc_url($optin_url) . '" class="button-primary button-large">' . esc_html__( 'Allow', 'subscribe2' ) . '</a>';
         echo '&nbsp;<a href="' . esc_url($optout_url) . '" class="button-secondary button-large">' . esc_html__( 'No thanks', 'subscribe2' ) . '</a>';
@@ -958,11 +958,15 @@ class Insights
                     <div class="wd-dr-modal-reason-input"><textarea></textarea></div>
                     <p class="wd-dr-modal-reasons-bottom">
                         <?php
-                        echo sprintf(
-                            $this->client->__trans('We share your data with <a href="%1$s" target="_blank">Appsero</a> to troubleshoot problems &amp; make product improvements. <a href="%2$s" target="_blank">Learn more</a> about how Appsero handles your data.'),
-                            esc_url('https://appsero.com/'),
-                            esc_url('https://appsero.com/privacy-policy')
-                        );
+                            echo sprintf(
+                                // Translators: 1: Appsero link, 2: Privacy policy link.
+                                esc_html__(
+                                    'We share your data with %1$s to troubleshoot problems &amp; make product improvements. %2$s about how Appsero handles your data.',
+                                    'subscribe2'
+                                ),
+                                '<a href="' . esc_url('https://appsero.com/') . '" target="_blank">' . esc_html__('Appsero', 'subscribe2') . '</a>',
+                                '<a href="' . esc_url('https://appsero.com/privacy-policy') . '" target="_blank">' . esc_html__('Learn more', 'subscribe2') . '</a>'
+                            );
                         ?>
                     </p>
                 </div>

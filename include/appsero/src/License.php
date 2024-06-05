@@ -260,7 +260,7 @@ class License {
         ?>
 
         <div class="wrap appsero-license-settings-wrapper">
-            <h1>License Settings</h1>
+            <h1><?php echo esc_html__( 'License Settings', 'subscribe2' ); ?></h1>
 
             <?php
                 $this->show_license_page_notices();
@@ -272,7 +272,11 @@ class License {
 
                 <div class="appsero-license-details">
                     <p>
-                        <?php printf( $this->client->__trans( 'Activate <strong>%s</strong> by your license key to get professional support and automatic update from your WordPress dashboard.' ), esc_html( $this->client->name ) ); ?>
+                        <?php printf( 
+                            // Translators: 1: Client name.
+                            esc_html__( 'Activate %1$s by your license key to get professional support and automatic update from your WordPress dashboard.', 'subscribe2' ), 
+                            '<strong>' . esc_html( $this->client->name ) . '</strong>' 
+                        ); ?>
                     </p>
                     <form method="post" novalidate="novalidate" spellcheck="false">
                         <input type="hidden" name="_action" value="<?php echo esc_attr( $action ); ?>">
