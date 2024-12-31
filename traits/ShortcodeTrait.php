@@ -4,6 +4,24 @@
  * Shortcode handler class.
  */
 trait Shortcode {
+	public $please_log_in;
+	public $confirmation_sent;
+	public $already_subscribed;
+	public $not_subscribed;
+	public $not_an_email;
+	public $barred_domain;
+	public $error;
+	public $no_such_email;
+	public $added;
+	public $deleted;
+	public $subscribe;
+	public $unsubscribe;
+	public $input_form_action;
+	public $form;
+	public $s2form;
+	public $email;
+	public $ip;
+	public $action;
 
 	/**
 	 * @var ?string
