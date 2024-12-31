@@ -216,7 +216,7 @@ trait Shortcode {
 			} elseif ( $this->is_barred( $this->email ) ) {
 				$this->s2form = $this->s2form . $this->barred_domain;
 			} else {
-				$this->ip = $_POST['ip'];
+				$this->ip = rest_is_ip_address( $_POST['ip'] ) ? $_POST['ip'] : $this->get_remote_ip();
 				if ( is_int( $this->lockout ) && $this->lockout > 0 ) {
 					$date = current_datetime( $this->lockout )->format( 'H:i:s.u' );
 					$ips  = $wpdb->get_col(
