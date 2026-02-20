@@ -764,31 +764,200 @@ class S2_Core {
 			$this->myname = __( 'HTML Full Preview', 'subscribe2' );
 			$this->mail( array( $preview ), $subject, $html_body, 'html' );
 		} else {
-			// Registered Subscribers first.
-			// First we send plaintext summary emails.
+			// Collect recipients by format for batch processing
+			$grouped_recipients = array();
+
+			// Registered Subscribers - plaintext excerpt
 			$recipients = $this->get_registered( "cats=$post_cats_string&format=excerpt&author=$post->post_author" );
 			$recipients = apply_filters( 's2_send_plain_excerpt_subscribers', $recipients, $post->ID );
-			$this->mail( $recipients, $subject, $plain_excerpt_body );
+			if ( ! empty( $recipients ) ) {
+				$grouped_recipients['plain_excerpt'] = $recipients;
+			}
 
-			// Next we send plaintext full content emails.
+			// Registered Subscribers - plaintext full
 			$recipients = $this->get_registered( "cats=$post_cats_string&format=post&author=$post->post_author" );
 			$recipients = apply_filters( 's2_send_plain_fullcontent_subscribers', $recipients, $post->ID );
-			$this->mail( $recipients, $subject, $plain_body );
+			if ( ! empty( $recipients ) ) {
+				$grouped_recipients['plain_full'] = $recipients;
+			}
 
-			// Next we send html excerpt content emails.
+			// Registered Subscribers - HTML excerpt
 			$recipients = $this->get_registered( "cats=$post_cats_string&format=html_excerpt&author=$post->post_author" );
 			$recipients = apply_filters( 's2_send_html_excerpt_subscribers', $recipients, $post->ID );
-			$this->mail( $recipients, $subject, $html_excerpt_body, 'html' );
+			if ( ! empty( $recipients ) ) {
+				$grouped_recipients['html_excerpt'] = $recipients;
+			}
 
-			// Next we send html full content emails.
+			// Registered Subscribers - HTML full
 			$recipients = $this->get_registered( "cats=$post_cats_string&format=html&author=$post->post_author" );
 			$recipients = apply_filters( 's2_send_html_fullcontent_subscribers', $recipients, $post->ID );
-			$this->mail( $recipients, $subject, $html_body, 'html' );
+			if ( ! empty( $recipients ) ) {
+				$grouped_recipients['html_full'] = $recipients;
+			}
 
-			// And finally we send to Public Subscribers.
+			// Public Subscribers
 			$recipients = apply_filters( 's2_send_public_subscribers', $public, $post->ID );
-			$this->mail( $recipients, $subject, $plain_excerpt_body, 'text' );
+			if ( ! empty( $recipients ) ) {
+				$grouped_recipients['public'] = $recipients;
+			}
+
+			// Prepare email data for batch processing
+			$email_data = array(
+				'subject' => $subject,
+				'bodies'  => array(
+					'plain_excerpt' => $plain_excerpt_body,
+					'plain_full'    => $plain_body,
+					'html_excerpt'  => $html_excerpt_body,
+					'html_full'     => $html_body,
+					'public'        => $plain_excerpt_body,
+				),
+				'sender'  => array(
+					'email' => $this->myemail,
+					'name'  => $this->myname,
+				),
+			);
+
+			// Schedule batch processing via cron
+			$this->schedule_per_post_email( $post->ID, $email_data, $grouped_recipients );
 		}
+	}
+
+	/**
+	 * Schedule per-post email sending via WordPress Cron for batch processing.
+	 * This prevents timeouts when sending to large subscriber lists.
+	 *
+	 * @since SUBSCRIBE2_SINCE
+	 *
+	 * @param int   $post_id Post ID.
+	 * @param array $email_data Prepared email data (subject, bodies, etc).
+	 * @param array $recipients Grouped recipients by format.
+	 * @return void
+	 */
+	public function schedule_per_post_email( $post_id, $email_data, $recipients ) {
+		// Store email data in post_meta
+		update_post_meta( $post_id, '_s2_email_data', $email_data );
+		update_post_meta( $post_id, '_s2_email_recipients', $recipients );
+		update_post_meta( $post_id, '_s2_email_sent', 0 );
+
+		// Schedule the first batch
+		wp_schedule_single_event(
+			time(),
+			's2_process_per_post_email',
+			array( $post_id )
+		);
+	}
+
+	/**
+	 * Process per-post emails in batches via WordPress Cron.
+	 *
+	 * @since SUBSCRIBE2_SINCE
+	 *
+	 * @param int $post_id Post ID.
+	 * @return void
+	 */
+	public function process_per_post_email_batch( $post_id ) {
+		// Safety: Check if post still exists
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			$this->cleanup_email_queue( $post_id );
+			return;
+		}
+
+		// Get stored data
+		$email_data = get_post_meta( $post_id, '_s2_email_data', true );
+		$all_recipients = get_post_meta( $post_id, '_s2_email_recipients', true );
+		$sent_count = (int) get_post_meta( $post_id, '_s2_email_sent', true );
+
+		if ( empty( $email_data ) || empty( $all_recipients ) ) {
+			$this->cleanup_email_queue( $post_id );
+			return;
+		}
+
+		// Get batch size (filterable)
+		$batch_size = apply_filters( 's2_batch_size', 50 );
+
+		// Flatten recipients into a list with their format info
+		$recipient_list = $this->flatten_recipients( $all_recipients );
+		$total = count( $recipient_list );
+
+		// Get next batch
+		$batch = array_slice( $recipient_list, $sent_count, $batch_size );
+
+		if ( empty( $batch ) ) {
+			// All done!
+			$this->cleanup_email_queue( $post_id );
+			return;
+		}
+
+		// Restore sender info from stored data
+		if ( isset( $email_data['sender'] ) ) {
+			$this->myemail = $email_data['sender']['email'];
+			$this->myname = $email_data['sender']['name'];
+		}
+
+		// Send batch - group by format to minimize mail() calls
+		$grouped = array();
+		foreach ( $batch as $recipient ) {
+			$grouped[ $recipient['format'] ][] = $recipient['email'];
+		}
+
+		foreach ( $grouped as $format => $emails ) {
+			$body = $email_data['bodies'][ $format ];
+			$type = ( 'html' === substr( $format, 0, 4 ) ) ? 'html' : 'text';
+			$this->mail( $emails, $email_data['subject'], $body, $type );
+		}
+
+		// Update progress
+		$new_sent = $sent_count + count( $batch );
+		update_post_meta( $post_id, '_s2_email_sent', $new_sent );
+
+		// Schedule next batch if needed
+		if ( $new_sent < $total ) {
+			wp_schedule_single_event(
+				time() + 60,
+				's2_process_per_post_email',
+				array( $post_id )
+			);
+		} else {
+			$this->cleanup_email_queue( $post_id );
+		}
+	}
+
+	/**
+	 * Flatten grouped recipients into a list with format info.
+	 *
+	 * @since SUBSCRIBE2_SINCE
+	 *
+	 * @param array $grouped Grouped recipients by format.
+	 * @return array Flat list with email and format keys.
+	 */
+	protected function flatten_recipients( $grouped ) {
+		$flat = array();
+
+		foreach ( $grouped as $format => $emails ) {
+			foreach ( $emails as $email ) {
+				$flat[] = array(
+					'email' => $email,
+					'format' => $format,
+				);
+			}
+		}
+
+		return $flat;
+	}
+
+	/**
+	 * Clean up email queue data from post_meta.
+	 *
+	 * @since SUBSCRIBE2_SINCE
+	 *
+	 * @param int $post_id Post ID.
+	 * @return void
+	 */
+	protected function cleanup_email_queue( $post_id ) {
+		delete_post_meta( $post_id, '_s2_email_data' );
+		delete_post_meta( $post_id, '_s2_email_recipients' );
+		delete_post_meta( $post_id, '_s2_email_sent' );
 	}
 
 	/**
@@ -2244,6 +2413,8 @@ class S2_Core {
 			add_action( 's2_digest_cron', array( $this, 'subscribe2_cron' ) );
 			add_action( 'transition_post_status', array( $this, 'digest_post_transitions' ), 10, 3 );
 		} else {
+			// Register batch processing hook for per-post emails
+			add_action( 's2_process_per_post_email', array( $this, 'process_per_post_email_batch' ) );
 			$statuses = apply_filters( 's2_post_statuses', array( 'new', 'draft', 'auto-draft', 'pending' ) );
 			if ( 'yes' === $this->subscribe2_options['private'] ) {
 				foreach ( $statuses as $status ) {
