@@ -142,6 +142,74 @@ class S2_Core {
 	}
 
 	/**
+	 * Handle the "Save Emails to CSV File" action.
+	 *
+	 * Runs on admin_init (after the init hook) so that translation calls inside
+	 * prepare_export() do not trigger the WP 6.7+ "textdomain loaded too early"
+	 * notice. Additionally, output is buffered and discarded around the export so
+	 * stray notices/warnings from any other plugin or theme cannot corrupt the CSV
+	 * download stream.
+	 *
+	 * @return void
+	 */
+	public function handle_csv_export() {
+		if ( ! current_user_can( apply_filters( 's2_capability', 'manage_options', 'manage' ) ) ) {
+			wp_die( 'Not permitted.' );
+		}
+
+		if (
+			! isset( $_REQUEST['s2-export-csv'] ) ||
+			! wp_verify_nonce( sanitize_key( $_REQUEST['s2-export-csv'] ), 's2-export-csv' )
+		) {
+			wp_die( 'Request cannot be completed.' );
+		}
+
+		// The exportcsv payload is a list of email addresses joined by ",\r\n".
+		// We cannot use sanitize_text_field() because it collapses the \r\n
+		// delimiter into a single space, which would flatten the entire list
+		// into one unparseable string. Instead, split on the delimiter and
+		// re-validate each address through sanitize_email(), then re-join.
+		// Anything that is not a valid email is discarded here; prepare_export()
+		// further filters to only known registered/public subscribers.
+		$exportcsv = '';
+		if ( isset( $_POST['exportcsv'] ) ) {
+			$raw     = wp_unslash( $_POST['exportcsv'] );
+			$emails  = preg_split( '/,\s*/', $raw, -1, PREG_SPLIT_NO_EMPTY );
+			$clean   = array();
+			foreach ( $emails as $email ) {
+				$email = sanitize_email( trim( $email ) );
+				if ( '' !== $email && is_email( $email ) ) {
+					$clean[] = $email;
+				}
+			}
+			$exportcsv = implode( ",\r\n", $clean );
+		}
+
+		// Build the CSV body into a string, discarding any incidental output
+		// (PHP notices, third-party plugin echoes) produced during generation.
+		ob_start();
+		$body   = $this->prepare_export( $exportcsv );
+		$stray  = ob_get_clean();
+		unset( $stray );
+
+		// Discard any output already buffered before this handler ran so the
+		// download stream contains only CSV bytes.
+		while ( ob_get_level() > 0 ) {
+			ob_end_clean();
+		}
+
+		$date = gmdate( 'Y-m-d' );
+		header( 'Content-Description: File Transfer' );
+		header( 'Content-type: text/csv; charset=utf-8' );
+		header( "Content-Disposition: attachment; filename=subscribe2_users_$date.csv" );
+		header( 'Pragma: no-cache' );
+		header( 'Expires: 0' );
+
+		echo $body; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		exit( 0 );
+	}
+
+	/**
 	 * Performs string substitutions for subscribe2 mail tags.
 	 *
 	 * @param string|null $string
@@ -2362,30 +2430,10 @@ class S2_Core {
 			// Register uninstall functions.
 			register_uninstall_hook( S2PLUGIN, array( 'S2_Admin', 's2_uninstall' ) );
 
-			// Capture CSV export.
+			// Capture CSV export. Deferred to admin_init so that translation calls
+			// inside prepare_export() fire after the 'init' hook (WP 6.7+ requirement).
 			if ( isset( $_POST['s2_admin'] ) && isset( $_POST['csv'] ) ) {
-                // Security check: Verify user has proper capabilities.
-                if ( ! current_user_can( apply_filters( 's2_capability', 'manage_options', 'manage' ) ) ) {
-                    wp_die( 'Not permitted.' );
-                }
-
-                // Security check: Verify nonce.
-                if (
-                    ! isset( $_REQUEST['s2-export-csv'] ) ||
-                    ! wp_verify_nonce( sanitize_key( $_REQUEST['s2-export-csv'] ), 's2-export-csv' )
-                ) {
-                    wp_die( 'Request cannot be completed.' );
-                }
-
-				$date = gmdate( 'Y-m-d' );
-				header( 'Content-Description: File Transfer' );
-				header( 'Content-type: application/octet-stream' );
-				header( "Content-Disposition: attachment; filename=subscribe2_users_$date.csv" );
-				header( 'Pragma: no-cache' );
-				header( 'Expires: 0' );
-
-				echo esc_html( $this->prepare_export( sanitize_text_field( $_POST['exportcsv'] ) ) );
-				exit( 0 );
+				add_action( 'admin_init', array( $this, 'handle_csv_export' ) );
 			}
 		} else {
 			// Load strings later on frontend for polylang plugin compatibility.
