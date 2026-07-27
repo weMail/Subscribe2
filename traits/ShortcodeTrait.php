@@ -153,13 +153,14 @@ trait Shortcode {
 		}
 
 		// Allow remote setting of email in form.
-		$email = ! empty( $_REQUEST['email'] ) ? sanitize_email( $_REQUEST['email'] ) : '';
-		if ( ! empty( $email ) && false !== $this->validate_email( $email ) ) {
-			$value = $email;
-		} elseif ( 'true' === strtolower( $args['nojs'] ) ) {
-			$value = '';
+		$email = ! empty( $_REQUEST['email'] ) ? sanitize_email( wp_unslash( $_REQUEST['email'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$value = ( ! empty( $email ) && false !== $this->validate_email( $email ) ) ? $email : '';
+
+		// Prompt text is rendered as a placeholder attribute, never as inline JavaScript.
+		if ( 'true' === strtolower( $args['nojs'] ) ) {
+			$placeholder = '';
 		} else {
-			$value = __( 'Enter email address...', 'subscribe2' );
+			$placeholder = ' placeholder="' . esc_attr__( 'Enter email address...', 'subscribe2' ) . '"';
 		}
 
 		// If wrap is true add paragraph html tags.
@@ -186,10 +187,12 @@ trait Shortcode {
 		}
 
 		// Build default form.
-		if ( 'true' === strtolower( $args['nojs'] ) ) {
-			$this->form = '<form name="' . $form_name . '" method="post"' . $action . '><input type="hidden" name="ip" value="' . esc_attr( $_SERVER['REMOTE_ADDR'] ) . '" />' . $antispam_text . '<p><label for="s2email">' . __( 'Your email:', 'subscribe2' ) . '</label><br><input type="email" name="email" id="s2email" value="' . esc_attr( $value ) . '" size="' . esc_attr( $args['size'] ) . '" />' . $wrap_text . $this->input_form_action . '</p></form>';
-		} else {
-			$this->form = '<form name="' . $form_name . '" method="post"' . $action . '><input type="hidden" name="ip" value="' . esc_attr( $_SERVER['REMOTE_ADDR'] ) . '" />' . $antispam_text . '<p><label for="s2email">' . __( 'Your email:', 'subscribe2' ) . '</label><br><input type="email" name="email" id="s2email" value="' . esc_attr( $value ) . '" size="' . esc_attr( $args['size'] ) . '" onfocus="if (this.value === \'' . $value . '\') {this.value = \'\';}" onblur="if (this.value === \'\') {this.value = \'' . $value . '\';}" />' . $wrap_text . $this->input_form_action . '</p></form>' . "\r\n";
+		$remote_addr = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+
+		$this->form = '<form name="' . $form_name . '" method="post"' . $action . '><input type="hidden" name="ip" value="' . esc_attr( $remote_addr ) . '" />' . $antispam_text . '<p><label for="s2email">' . __( 'Your email:', 'subscribe2' ) . '</label><br><input type="email" name="email" id="s2email" value="' . esc_attr( $value ) . '" size="' . esc_attr( $args['size'] ) . '"' . $placeholder . ' />' . $wrap_text . $this->input_form_action . '</p></form>';
+
+		if ( 'true' !== strtolower( $args['nojs'] ) ) {
+			$this->form .= "\r\n";
 		}
 		$this->s2form = apply_filters( 's2_form', $this->form, $args );
 
