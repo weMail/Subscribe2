@@ -1,3 +1,11 @@
+= 10.47 (27th July, 2026) =
+
+* Fix: SQL injection in the bulk "change email format" action for registered subscribers. The submitted format value was interpolated into an UPDATE statement instead of being passed through $wpdb->prepare().
+* Fix: Block editor email preview always used the digest branch because the plugin options were read from an undefined property, which also caused an "Undefined array key" warning during preview.
+* Fix: Subscription confirmation links no longer emit PHP warnings when the s2 parameter is missing or malformed.
+* Fix: PHP 8.2 "creation of dynamic property" deprecation notices by declaring previously undeclared class properties.
+* Fix: PHP 8.1+ "passing null" deprecation notices when building notification emails.
+
 = 10.46 (27th July, 2026) =
 
 * Fix: Reflected Cross-Site Scripting in the [subscribe2] subscription form. The email request parameter was reflected unescaped into the email field's inline onfocus/onblur JavaScript handlers. Thanks to Omar Elshopky and WPScan for the responsible disclosure.

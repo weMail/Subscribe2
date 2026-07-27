@@ -4,7 +4,7 @@ Donate link: https://getwemail.io
 Tags: posts, subscription, email, subscribe, notify, notification, newsletter, post notification, email marketing, optin, form
 Requires at least: 4.0
 Tested up to: 6.9
-Stable tag: 10.46
+Stable tag: 10.47
 Requires PHP: 5.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -71,6 +71,14 @@ This token will automatically be replaced by dynamic subscription information an
 [Visit FAQ site](https://subscribe2.wordpress.com/support/faqs/)
 
 == Changelog ==
+
+= 10.47 (27th July, 2026) =
+
+* Fix: SQL injection in the bulk "change email format" action for registered subscribers. The submitted format value was interpolated into an UPDATE statement instead of being passed through $wpdb->prepare().
+* Fix: Block editor email preview always used the digest branch because the plugin options were read from an undefined property, which also caused an "Undefined array key" warning during preview.
+* Fix: Subscription confirmation links no longer emit PHP warnings when the s2 parameter is missing or malformed.
+* Fix: PHP 8.2 "creation of dynamic property" deprecation notices by declaring previously undeclared class properties.
+* Fix: PHP 8.1+ "passing null" deprecation notices when building notification emails.
 
 = 10.46 (27th July, 2026) =
 

@@ -80,7 +80,7 @@ class S2_Frontend extends S2_Core {
 	 */
 	public function title_filter( $title ) {
 		if ( in_the_loop() ) {
-			$code   = $_GET['s2'];
+			$code   = isset( $_GET['s2'] ) ? sanitize_text_field( wp_unslash( $_GET['s2'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$action = intval( substr( $code, 0, 1 ) );
 
 			if ( 1 === $action ) {
@@ -109,7 +109,7 @@ class S2_Frontend extends S2_Core {
 			return $content;
 		}
 
-		$code   = $_GET['s2'];
+		$code   = isset( $_GET['s2'] ) ? sanitize_text_field( wp_unslash( $_GET['s2'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$action = substr( $code, 0, 1 );
 		$hash   = substr( $code, 1, 32 );
 		$id     = intval( substr( $code, 33 ) );

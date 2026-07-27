@@ -37,81 +37,102 @@ class S2_Core {
 	public $filtered = 0;
 
 	/**
+	 * Subscriber email address being processed.
+	 *
+	 * @var string|null
+	 */
+	public $email;
+
+	/**
+	 * IP address recorded against a subscription request.
+	 *
+	 * @var string|null
+	 */
+	public $ip;
+
+	/**
+	 * Message returned to the visitor after a form action.
+	 *
+	 * @var string|null
+	 */
+	public $message;
+
+	/**
 	 * State variable for affect processing.
 	 *
-	 * @var int|null
+	 * @var int
 	 */
-	public $post_count;
+	public $post_count = 0;
 
 	/**
 	 * Post title used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $post_title;
+	public $post_title = '';
 
 	/**
 	 * Post title used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $post_title_text;
+	public $post_title_text = '';
 
 	/**
 	 * Post permalink used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $permalink;
+	public $permalink = '';
 
 	/**
 	 * Post date used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $post_date;
+	public $post_date = '';
 
 	/**
 	 * Post time used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $post_time;
+	public $post_time = '';
 
 	/**
 	 * State myname used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $myname;
+	public $myname = '';
 
 	/**
 	 * State myemail used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $myemail;
+	public $myemail = '';
 
 	/**
 	 * State author used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $authorname;
+	public $authorname = '';
 
 	/**
 	 * Post category names used for substitute() function.
 	 *
-	 * @var array|null
+	 * @var string
 	 */
-	public $post_cat_names;
+	public $post_cat_names = '';
 
 	/**
 	 * Post tag names used for substitute() function.
 	 *
-	 * @var array|null
+	 * @var string
 	 */
-	public $post_tag_names;
+	public $post_tag_names = '';
 	public $script_debug;
 	public $word_wrap;
 	public $excerpt_length;
@@ -436,7 +457,7 @@ class S2_Core {
 	 */
 	public function get_tracking_link( $link ) {
 		if ( empty( $link ) ) {
-			return;
+			return '';
 		}
 
 		$delimiter = '';
