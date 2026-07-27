@@ -1,3 +1,8 @@
+= 10.46 (27th July, 2026) =
+
+* Fix: Reflected Cross-Site Scripting in the [subscribe2] subscription form. The email request parameter was reflected unescaped into the email field's inline onfocus/onblur JavaScript handlers. Thanks to Omar Elshopky and WPScan for the responsible disclosure.
+* Enhance: The email field prompt now uses the standard placeholder attribute instead of inline JavaScript handlers.
+
 = 10.45 (29th Dec, 2025) =
 
 * Enhance: Capability checks added for better security.
