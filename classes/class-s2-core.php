@@ -37,6 +37,13 @@ class S2_Core {
 	public $filtered = 0;
 
 	/**
+	 * True while sending a preview rather than a real notification.
+	 *
+	 * @var bool
+	 */
+	public $preview_email = false;
+
+	/**
 	 * Subscriber email address being processed.
 	 *
 	 * @var string|null

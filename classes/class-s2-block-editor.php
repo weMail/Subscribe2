@@ -59,8 +59,8 @@ class S2_Block_Editor {
 						},
 					),
 				),
-				'permission_callback' => function () {
-					return current_user_can( 'edit_posts' );
+				'permission_callback' => function ( $request ) {
+					return current_user_can( 'edit_post', (int) $request['id'] );
 				},
 			)
 		);
@@ -83,8 +83,11 @@ class S2_Block_Editor {
 						},
 					),
 				),
-				'permission_callback' => function () {
-					return current_user_can( 'edit_posts' );
+				// Resending mails the live subscriber list, so require the same
+				// capability as the Send Email screen, not merely edit_posts.
+				'permission_callback' => function ( $request ) {
+					return current_user_can( apply_filters( 's2_capability', 'manage_options', 'send' ) )
+						&& current_user_can( 'edit_post', (int) $request['id'] );
 				},
 			)
 		);
@@ -101,14 +104,14 @@ class S2_Block_Editor {
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'setting' ),
 				'args'                => array(
-					'id' => array(
+					'setting' => array(
 						'validate_callback' => function( $param ) {
 							return preg_match( '/^[a-z0-9_]+$/', $param ) > 0;
 						},
 					),
 				),
 				'permission_callback' => function () {
-					return current_user_can( 'edit_posts' );
+					return current_user_can( apply_filters( 's2_capability', 'manage_options', 'settings' ) );
 				},
 			)
 		);

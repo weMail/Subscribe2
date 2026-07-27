@@ -3,7 +3,7 @@ Contributors: tareq1988, nizamuddinbabu, wemail
 Donate link: https://getwemail.io
 Tags: posts, subscription, email, subscribe, notify, notification, newsletter, post notification, email marketing, optin, form
 Requires at least: 4.0
-Tested up to: 6.9
+Tested up to: 7.0
 Stable tag: 10.47
 Requires PHP: 5.4
 License: GPLv3
