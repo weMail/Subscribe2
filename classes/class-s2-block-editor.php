@@ -17,6 +17,7 @@ class S2_Block_Editor {
 		add_action( 'rest_api_init', array( $this, 'register_preview_endpoint' ) );
 		add_action( 'rest_api_init', array( $this, 'register_resend_endpoint' ) );
 		add_action( 'rest_api_init', array( $this, 'register_settings_endpoint' ) );
+		add_action( 'rest_api_init', array( $this, 'register_editor_setting_endpoint' ) );
 
 		if ( is_admin() ) {
 			add_action( 'enqueue_block_editor_assets', array( &$this, 'gutenberg_block_editor_assets' ), 6 );
@@ -118,6 +119,30 @@ class S2_Block_Editor {
 	}
 
 	/**
+	 * Register REST endpoint for the settings read by the Block Editor sidebar
+	 */
+	public function register_editor_setting_endpoint() {
+		register_rest_route(
+			's2/v1',
+			'/editor-setting/(?P<name>[a-z0-9_]+)',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'editor_setting' ),
+				'args'                => array(
+					'name' => array(
+						'validate_callback' => function( $param ) {
+							return preg_match( '/^[a-z0-9_]+$/', $param ) > 0;
+						},
+					),
+				),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+			)
+		);
+	}
+
+	/**
 	 * Function to trigger Preview email on REST API request
 	 */
 	public function preview( $data ) {
@@ -167,6 +192,27 @@ class S2_Block_Editor {
 	}
 
 	/**
+	 * Function to return the value of a setting needed by the Block Editor sidebar
+	 *
+	 * Only the two settings the sidebar reads are exposed here; every other name
+	 * returns false so this endpoint cannot be used to read the whole option array.
+	 */
+	public function editor_setting( $data ) {
+		global $mysubscribe2;
+
+		$allowed = array( 'private', 's2meta_default' );
+		if ( ! in_array( $data['name'], $allowed, true ) ) {
+			return false;
+		}
+
+		if ( array_key_exists( $data['name'], $mysubscribe2->subscribe2_options ) ) {
+			return $mysubscribe2->subscribe2_options[ $data['name'] ];
+		}
+
+		return false;
+	}
+
+	/**
 	 * Enqueue Block Editor assets
 	 */
 	public function gutenberg_block_editor_assets() {
@@ -189,7 +235,7 @@ class S2_Block_Editor {
 			'subscribe2-sidebar',
 			S2URL . 'gutenberg/sidebar' . $this->script_debug . '.js',
 			array( 'wp-plugins', 'wp-element', 'wp-i18n', 'wp-edit-post', 'wp-components', 'wp-data', 'wp-compose', 'wp-api-fetch' ),
-			'1.1',
+			'1.2',
 			true
 		);
 	}
