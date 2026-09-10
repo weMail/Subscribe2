@@ -39,9 +39,12 @@ class S2_Core {
 	/**
 	 * True while sending a preview rather than a real notification.
 	 *
-	 * @var bool
+	 * Left null (never false) so isset() stays false for normal sends and the
+	 * wpmq_mail queue path in mail() is used.
+	 *
+	 * @var bool|null
 	 */
-	public $preview_email = false;
+	public $preview_email = null;
 
 	/**
 	 * Subscriber email address being processed.
