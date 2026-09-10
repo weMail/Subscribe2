@@ -6,6 +6,13 @@
 class S2_Ajax {
 
 	/**
+	 * Suffix used to load minified or development scripts.
+	 *
+	 * @var string
+	 */
+	public $script_debug = '';
+
+	/**
 	 * Class constructor.
 	 */
 	public function __construct() {

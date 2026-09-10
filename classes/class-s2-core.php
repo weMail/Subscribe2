@@ -37,81 +37,114 @@ class S2_Core {
 	public $filtered = 0;
 
 	/**
+	 * True while sending a preview rather than a real notification.
+	 *
+	 * Left null (never false) so isset() stays false for normal sends and the
+	 * wpmq_mail queue path in mail() is used.
+	 *
+	 * @var bool|null
+	 */
+	public $preview_email = null;
+
+	/**
+	 * Subscriber email address being processed.
+	 *
+	 * @var string|null
+	 */
+	public $email;
+
+	/**
+	 * IP address recorded against a subscription request.
+	 *
+	 * @var string|null
+	 */
+	public $ip;
+
+	/**
+	 * Message returned to the visitor after a form action.
+	 *
+	 * @var string|null
+	 */
+	public $message;
+
+	/**
 	 * State variable for affect processing.
+	 *
+	 * Null outside digest sends so {COUNT} renders as an empty string.
 	 *
 	 * @var int|null
 	 */
-	public $post_count;
+	public $post_count = null;
 
 	/**
 	 * Post title used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $post_title;
+	public $post_title = '';
 
 	/**
 	 * Post title used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $post_title_text;
+	public $post_title_text = '';
 
 	/**
 	 * Post permalink used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $permalink;
+	public $permalink = '';
 
 	/**
 	 * Post date used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $post_date;
+	public $post_date = '';
 
 	/**
 	 * Post time used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $post_time;
+	public $post_time = '';
 
 	/**
 	 * State myname used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $myname;
+	public $myname = '';
 
 	/**
 	 * State myemail used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $myemail;
+	public $myemail = '';
 
 	/**
 	 * State author used for substitute() function.
 	 *
 	 * @var string|null
 	 */
-	public $authorname;
+	public $authorname = '';
 
 	/**
 	 * Post category names used for substitute() function.
 	 *
-	 * @var array|null
+	 * @var string
 	 */
-	public $post_cat_names;
+	public $post_cat_names = '';
 
 	/**
 	 * Post tag names used for substitute() function.
 	 *
-	 * @var array|null
+	 * @var string
 	 */
-	public $post_tag_names;
+	public $post_tag_names = '';
 	public $script_debug;
 	public $word_wrap;
 	public $excerpt_length;
@@ -181,7 +214,7 @@ class S2_Core {
 		$string = str_replace( '{AUTHORNAME}', stripslashes( $this->authorname ), $string );
 		$string = str_replace( '{CATS}', $this->post_cat_names, $string );
 		$string = str_replace( '{TAGS}', $this->post_tag_names, $string );
-		$string = str_replace( '{COUNT}', $this->post_count, $string );
+		$string = str_replace( '{COUNT}', (string) $this->post_count, $string );
 
 		if ( ! empty( $digest_post_ids ) ) {
 			return apply_filters( 's2_custom_keywords', $string, $digest_post_ids );
@@ -436,7 +469,7 @@ class S2_Core {
 	 */
 	public function get_tracking_link( $link ) {
 		if ( empty( $link ) ) {
-			return;
+			return '';
 		}
 
 		$delimiter = '';

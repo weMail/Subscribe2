@@ -1203,10 +1203,21 @@ class S2_Admin extends S2_Core {
 		$useremails = explode( ",\r\n", $emails );
 		$useremails = implode( ', ', array_map( array( $this, 'prepare_in_data' ), $useremails ) );
 		$ids        = $wpdb->get_col( "SELECT ID FROM $wpdb->users WHERE user_email IN ($useremails)" ); // phpcs:ignore WordPress.DB.PreparedSQL
-		$ids        = implode( ',', array_map( array( $this, 'prepare_in_data' ), $ids ) );
-		$sql        = "UPDATE $wpdb->usermeta SET meta_value='{$format}' WHERE meta_key='" . $this->get_usermeta_keyname( 's2_format' ) . "' AND user_id IN ($ids)";
 
-		$wpdb->query( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL
+		if ( empty( $ids ) ) {
+			return;
+		}
+
+		$ids = implode( ',', array_map( 'intval', $ids ) );
+
+		$wpdb->query( // phpcs:ignore WordPress.DB.PreparedSQL
+			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- $ids is an integer-cast list built above.
+				"UPDATE $wpdb->usermeta SET meta_value = %s WHERE meta_key = %s AND user_id IN ($ids)",
+				$format,
+				$this->get_usermeta_keyname( 's2_format' )
+			)
+		);
 	}
 
 	/**
