@@ -70,9 +70,11 @@ class S2_Core {
 	/**
 	 * State variable for affect processing.
 	 *
-	 * @var int
+	 * Null outside digest sends so {COUNT} renders as an empty string.
+	 *
+	 * @var int|null
 	 */
-	public $post_count = 0;
+	public $post_count = null;
 
 	/**
 	 * Post title used for substitute() function.
@@ -212,7 +214,7 @@ class S2_Core {
 		$string = str_replace( '{AUTHORNAME}', stripslashes( $this->authorname ), $string );
 		$string = str_replace( '{CATS}', $this->post_cat_names, $string );
 		$string = str_replace( '{TAGS}', $this->post_tag_names, $string );
-		$string = str_replace( '{COUNT}', $this->post_count, $string );
+		$string = str_replace( '{COUNT}', (string) $this->post_count, $string );
 
 		if ( ! empty( $digest_post_ids ) ) {
 			return apply_filters( 's2_custom_keywords', $string, $digest_post_ids );
