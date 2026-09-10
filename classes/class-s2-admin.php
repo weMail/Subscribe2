@@ -1189,12 +1189,16 @@ class S2_Admin extends S2_Core {
 	 * Handles bulk changes to email format for Registered Subscribers.
 	 *
 	 * @param string $emails
-	 * @param string $format
+	 * @param string $format Must be one of html, html_excerpt, post, excerpt.
 	 *
 	 * @return void
 	 */
 	public function format_change( $emails, $format ) {
 		if ( empty( $format ) ) {
+			return;
+		}
+
+		if ( ! in_array( $format, array( 'html', 'html_excerpt', 'post', 'excerpt' ), true ) ) {
 			return;
 		}
 
