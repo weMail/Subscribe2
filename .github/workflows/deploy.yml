@@ -1,0 +1,79 @@
+name: Deploy and Release Plugin to WP.org
+
+on:
+    push:
+        tags:
+            - "*"
+
+jobs:
+    releaseToWPOrg:
+        name: Release to WordPress.org
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            # Hard gate: the 10up deploy action names the wp.org tags/<version>
+            # directory after the pushed git tag (leading "v" stripped) and never
+            # reads the plugin files. Fail fast if the tag disagrees with them.
+            - name: Verify tag matches plugin version
+              run: |
+                TAG="${GITHUB_REF_NAME#v}"
+
+                HEADER_VERSION=$(awk '/^Version:/ { print $2; exit }' subscribe2.php)
+                S2VERSION=$(grep -m1 "define( 'S2VERSION'" subscribe2.php | cut -d "'" -f4 || true)
+                STABLE_TAG=$(awk '/^Stable tag:/ { print $3; exit }' readme.txt)
+
+                FAIL=0
+                if [ -z "$TAG" ]; then
+                    echo "::error::Pushed ref '$GITHUB_REF' produced an empty version. This workflow must be triggered by a tag push."
+                    FAIL=1
+                fi
+                if [ -z "$HEADER_VERSION" ]; then
+                    echo "::error::subscribe2.php: no 'Version:' header found (expected a line like 'Version: 10.48')."
+                    FAIL=1
+                elif [ "$HEADER_VERSION" != "$TAG" ]; then
+                    echo "::error::subscribe2.php: header 'Version: $HEADER_VERSION' does not match pushed tag '$TAG'."
+                    FAIL=1
+                fi
+                if [ -z "$S2VERSION" ]; then
+                    echo "::error::subscribe2.php: S2VERSION define not found (expected: define( 'S2VERSION', '10.48' );)."
+                    FAIL=1
+                elif [ "$S2VERSION" != "$TAG" ]; then
+                    echo "::error::subscribe2.php: S2VERSION '$S2VERSION' does not match pushed tag '$TAG'."
+                    FAIL=1
+                fi
+                if [ -z "$STABLE_TAG" ]; then
+                    echo "::error::readme.txt: no 'Stable tag:' header found (expected a line like 'Stable tag: 10.48')."
+                    FAIL=1
+                elif [ "$STABLE_TAG" != "$TAG" ]; then
+                    echo "::error::readme.txt: 'Stable tag: $STABLE_TAG' does not match pushed tag '$TAG'."
+                    FAIL=1
+                fi
+                if [ "$FAIL" -ne 0 ]; then
+                    echo "::error::Version consistency check failed: tag '$TAG' vs header Version '$HEADER_VERSION' / S2VERSION '$S2VERSION' / readme Stable tag '$STABLE_TAG'. Bump the plugin files (or fix the tag) and push a new tag."
+                    exit 1
+                fi
+                echo "Version consistency check passed: tag '$TAG' == Version == S2VERSION == Stable tag."
+
+            # SLUG is mandatory: the action would default it to the repo name
+            # "Subscribe2" (wrong case for wp.org). Pinned to the exact 2.3.0
+            # commit (immutable) instead of the mutable @stable/@2.3.0 refs.
+            - name: WordPress Plugin Deploy
+              id: deploy
+              uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2 # 2.3.0
+              with:
+                generate-zip: true
+              env:
+                SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+                SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+                SLUG: subscribe2
+
+            - name: Create GitHub release
+              uses: softprops/action-gh-release@v2
+              with:
+                files: ${{ steps.deploy.outputs.zip-path }}
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
