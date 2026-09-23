@@ -1,3 +1,10 @@
+= 10.48 (23rd September, 2026) =
+
+* Fix: Stored Cross-Site Scripting in the Subscribers list table. The signup IP address recorded for public subscribers was rendered unescaped, allowing content stored through the AJAX subscription form (available when the popup style subscription form is enabled) to execute in an administrator's browser. Subscriber email addresses in the list are now escaped as well. Thanks to Wordfence for the responsible disclosure.
+* Fix: The AJAX subscription handler now validates the submitted IP address and stores an empty value when it is not a valid IP address.
+* Fix: Submitting array values to the subscription form or the AJAX handler no longer causes a PHP fatal error on public pages.
+* Enhance: get_remote_ip() now validates each address header and ignores values that are not valid IP addresses.
+
 = 10.47 (10th September, 2026) =
 
 * Fix: SQL injection in the bulk "change email format" action for registered subscribers. The submitted format value was interpolated into an UPDATE statement instead of being passed through $wpdb->prepare(). Thanks to Wordfence for the responsible disclosure.

@@ -4,7 +4,7 @@ Donate link: https://getwemail.io
 Tags: posts, subscription, email, subscribe, notify, notification, newsletter, post notification, email marketing, optin, form
 Requires at least: 4.0
 Tested up to: 7.0
-Stable tag: 10.47
+Stable tag: 10.48
 Requires PHP: 5.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -71,6 +71,13 @@ This token will automatically be replaced by dynamic subscription information an
 [Visit FAQ site](https://subscribe2.wordpress.com/support/faqs/)
 
 == Changelog ==
+
+= 10.48 (23rd September, 2026) =
+
+* Fix: Stored Cross-Site Scripting in the Subscribers list table. The signup IP address recorded for public subscribers was rendered unescaped, allowing content stored through the AJAX subscription form (available when the popup style subscription form is enabled) to execute in an administrator's browser. Subscriber email addresses in the list are now escaped as well.
+* Fix: The AJAX subscription handler now validates the submitted IP address and stores an empty value when it is not a valid IP address.
+* Fix: Submitting array values to the subscription form or the AJAX handler no longer causes a PHP fatal error on public pages.
+* Enhance: get_remote_ip() now validates each address header and ignores values that are not valid IP addresses.
 
 = 10.47 (10th September, 2026) =
 
