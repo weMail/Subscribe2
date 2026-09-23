@@ -103,6 +103,8 @@ trait Shortcode {
 			),
 			$atts
 		);
+		$args['size'] = is_scalar( $args['size'] ) ? $args['size'] : 20;
+		$args['link'] = is_string( $args['link'] ) ? $args['link'] : '';
 
 		// If link is true return a link to the page with the ajax class.
 		if ( '1' === $this->subscribe2_options['ajax'] && '' !== $args['link'] && ! is_user_logged_in() ) {
