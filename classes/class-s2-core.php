@@ -1337,6 +1337,21 @@ class S2_Core {
 	}
 
 	/**
+	 * Split a comma/whitespace separated list of emails into sanitized addresses.
+	 *
+	 * @param mixed $list Raw (slashed) request value.
+	 *
+	 * @return array
+	 */
+	public function sanitize_email_list( $list ) {
+		if ( ! is_string( $list ) ) {
+			return array();
+		}
+
+		return array_values( array_filter( array_map( 'sanitize_email', preg_split( '/[\s,]+/', wp_unslash( $list ) ) ) ) );
+	}
+
+	/**
 	 * Create the appropriate usermeta values when a user registers.
 	 * If the registering user had previously subscribed to notifications, this function will delete them from the public subscriber list first.
 	 *
@@ -2417,7 +2432,8 @@ class S2_Core {
 				header( 'Pragma: no-cache' );
 				header( 'Expires: 0' );
 
-				echo esc_html( $this->prepare_export( sanitize_text_field( $_POST['exportcsv'] ) ) );
+				$export_emails = isset( $_POST['exportcsv'] ) ? $this->sanitize_email_list( $_POST['exportcsv'] ) : array();
+				echo $this->prepare_export( implode( ",\r\n", $export_emails ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSV file download, not HTML.
 				exit( 0 );
 			}
 		} else {
