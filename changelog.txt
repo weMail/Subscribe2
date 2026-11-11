@@ -1,3 +1,8 @@
+= 10.49 (11th November, 2026) =
+
+* Fix: The "Save Emails to CSV File" button on the Subscribers screen exported a file containing only the header row whenever more than one subscriber was listed, because the line breaks separating the addresses were stripped before the list was split. The list is now split and each address sanitized individually, restoring one row per subscriber.
+* Fix: The exported CSV file no longer HTML-encodes its data. Subscriber display names and category names containing & or ' appeared as &amp; and &#039; in the downloaded file.
+
 = 10.48 (23rd September, 2026) =
 
 * Fix: Stored Cross-Site Scripting in the Subscribers list table. The signup IP address recorded for public subscribers was rendered unescaped, allowing content stored through the AJAX subscription form (available when the popup style subscription form is enabled) to execute in an administrator's browser. Subscriber email addresses in the list are now escaped as well. Thanks to Wordfence for the responsible disclosure.

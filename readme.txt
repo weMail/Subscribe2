@@ -4,7 +4,7 @@ Donate link: https://getwemail.io
 Tags: posts, subscription, email, subscribe, notify, notification, newsletter, post notification, email marketing, optin, form
 Requires at least: 4.7
 Tested up to: 7.0
-Stable tag: 10.48
+Stable tag: 10.49
 Requires PHP: 5.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -71,6 +71,11 @@ This token will automatically be replaced by dynamic subscription information an
 [Visit FAQ site](https://subscribe2.wordpress.com/support/faqs/)
 
 == Changelog ==
+
+= 10.49 (11th November, 2026) =
+
+* Fix: The "Save Emails to CSV File" button on the Subscribers screen exported a file containing only the header row whenever more than one subscriber was listed, because the line breaks separating the addresses were stripped before the list was split. The list is now split and each address sanitized individually, restoring one row per subscriber.
+* Fix: The exported CSV file no longer HTML-encodes its data. Subscriber display names and category names containing & or ' appeared as &amp; and &#039; in the downloaded file.
 
 = 10.48 (23rd September, 2026) =
 
