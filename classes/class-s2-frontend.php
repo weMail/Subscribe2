@@ -6,14 +6,19 @@
 class S2_Frontend extends S2_Core {
 
     /**
-     * Process unsubscribe.
+     * Process unsubscribe from a one-click {UNSUBLINK} link.
      *
-     * @param $email
+     * @param string $email
+     * @param string $key   Key from the link, must match unsubscribe_key( $email ).
      */
-	public function unsubscribe( $email ) {
+	public function unsubscribe( $email, $key = '' ) {
 	    global $wpdb;
 
         if ( ! filter_var( $email, FILTER_VALIDATE_EMAIL ) ) {
+            return;
+        }
+
+        if ( ! is_string( $key ) || '' === $key || ! hash_equals( $this->unsubscribe_key( $email ), $key ) ) {
             return;
         }
 

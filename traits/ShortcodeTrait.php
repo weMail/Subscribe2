@@ -77,7 +77,8 @@ trait Shortcode {
         $this->unsubscribe = __( 'unsubscribe', 'subscribe2' ); //ACTION replacement in unsubscribing in confirmation email
 
         if ( ! empty( $_GET['s2_unsub'] ) && is_string( $_GET['s2_unsub'] ) ) {
-	        $this->unsubscribe( sanitize_email( base64_decode( $_GET['s2_unsub'] ) ) );
+	        $key = ( isset( $_GET['s2_key'] ) && is_string( $_GET['s2_key'] ) ) ? sanitize_text_field( wp_unslash( $_GET['s2_key'] ) ) : '';
+	        $this->unsubscribe( sanitize_email( base64_decode( wp_unslash( $_GET['s2_unsub'] ) ) ), $key );
         }
     }
 
