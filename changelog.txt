@@ -1,3 +1,8 @@
+= 10.50 (16th November, 2026) =
+
+* Security: One-click unsubscribe links ({UNSUBLINK}) could be forged, allowing anyone who knew a public subscriber's email address to remove them from the list. Each link now carries a secret key and is only honoured when the key matches. Unsubscribe links in emails sent before this update no longer work; subscribers can still unsubscribe through the subscription form. Thanks to "Respect" for the responsible disclosure.
+* Fix: When notification emails were sent individually, every recipient after the first received the first recipient's unsubscribe link. Each recipient now gets their own link.
+
 = 10.49 (11th November, 2026) =
 
 * Fix: The "Save Emails to CSV File" button on the Subscribers screen exported a file containing only the header row whenever more than one subscriber was listed, because the line breaks separating the addresses were stripped before the list was split. The list is now split and each address sanitized individually, restoring one row per subscriber.

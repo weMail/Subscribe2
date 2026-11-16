@@ -4,7 +4,7 @@ Donate link: https://getwemail.io
 Tags: posts, subscription, email, subscribe, notify, notification, newsletter, post notification, email marketing, optin, form
 Requires at least: 4.7
 Tested up to: 7.0
-Stable tag: 10.49
+Stable tag: 10.50
 Requires PHP: 5.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -71,6 +71,11 @@ This token will automatically be replaced by dynamic subscription information an
 [Visit FAQ site](https://subscribe2.wordpress.com/support/faqs/)
 
 == Changelog ==
+
+= 10.50 (16th November, 2026) =
+
+* Security: One-click unsubscribe links ({UNSUBLINK}) could be forged, allowing anyone who knew a public subscriber's email address to remove them from the list. Each link now carries a secret key and is only honoured when the key matches. Unsubscribe links in emails sent before this update no longer work; subscribers can still unsubscribe through the subscription form.
+* Fix: When notification emails were sent individually, every recipient after the first received the first recipient's unsubscribe link. Each recipient now gets their own link.
 
 = 10.49 (11th November, 2026) =
 
