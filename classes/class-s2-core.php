@@ -278,13 +278,14 @@ class S2_Core {
 				}
 
                 // Parse unsubscribe shortcode.
-                $mailtext = $this->parse_unsubscribe_link( $mailtext, $recipient );
+                // Per-recipient copy: the link carries this recipient's key, so it must not leak into the next email.
+                $recipient_mailtext = $this->parse_unsubscribe_link( $mailtext, $recipient );
 
 				// Use the mail queue provided we are not sending a preview.
 				if ( function_exists( 'wpmq_mail' ) && ! isset( $this->preview_email ) ) {
-					$status = wp_mail( $recipient, $subject, $mailtext, $headers, $attachments, 0 );
+					$status = wp_mail( $recipient, $subject, $recipient_mailtext, $headers, $attachments, 0 );
 				} else {
-					$status = wp_mail( $recipient, $subject, $mailtext, $headers, $attachments );
+					$status = wp_mail( $recipient, $subject, $recipient_mailtext, $headers, $attachments );
 				}
 			}
 
@@ -435,11 +436,23 @@ class S2_Core {
 			return str_replace('{UNSUBLINK}', '', $content );
 		}
 
+		$recipient = sanitize_email( $recipient );
 		$page_url  = get_page_link( $this->subscribe2_options['s2_unsub_page'] );
 		$query     = parse_url( $page_url, PHP_URL_QUERY );
-		$page_url .= ( ( $query ? '&' : '?' ) . 's2_unsub=' . base64_encode( $recipient ) );
+		$page_url .= ( $query ? '&' : '?' ) . 's2_unsub=' . rawurlencode( base64_encode( $recipient ) ) . '&s2_key=' . rawurlencode( $this->unsubscribe_key( $recipient ) );
 
 		return str_replace('{UNSUBLINK}', $page_url, $content );
+	}
+
+	/**
+	 * Secret key that proves an unsubscribe link was issued by this site for this address.
+	 *
+	 * @param string $email
+	 *
+	 * @return string
+	 */
+	public function unsubscribe_key( $email ) {
+		return wp_hash( 's2_unsub|' . strtolower( $email ) );
 	}
 
 	/**
