@@ -5,6 +5,20 @@ class S2_Admin extends S2_Core {
 	public $signup_ips;
 
 	/**
+	 * Outcome of Resend Notification in this request, shown after the redirect.
+	 *
+	 * @var string
+	 */
+	private $resend_result = '';
+
+	/**
+	 * IDs of the posts whose status changed in this request.
+	 *
+	 * @var array
+	 */
+	private $status_changed = array();
+
+	/**
 	 * Register wp menu & handle scripts.
 	 *
 	 * @return void
@@ -556,7 +570,8 @@ class S2_Admin extends S2_Core {
 	 *
 	 * @return void
 	 */
-	public function s2_preview_meta() {
+	public function s2_preview_meta( $post ) {
+		wp_nonce_field( 's2_preview_' . $post->ID, 's2_preview_nonce', false );
 		echo '<p>' . esc_html__( 'Send preview email of this post to currently logged in user:', 'subscribe2' ) . '</p>' . "\r\n";
 		echo '<input class="button" name="s2_preview" type="submit" value="' . esc_attr( __( 'Send Preview', 'subscribe2' ) ) . '" />' . "\r\n";
 	}
@@ -564,21 +579,33 @@ class S2_Admin extends S2_Core {
 	/**
 	 * Meta preview box handler.
 	 *
+	 * @param int $post_id
+	 *
 	 * @return void
 	 */
-	public function s2_preview_handler() {
-		if ( isset( $_POST['s2_preview'] ) ) {
-			if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
-				return;
-			}
+	public function s2_preview_handler( $post_id ) {
+		if ( ! isset( $_POST['s2_preview'] ) || ! $this->is_editor_save( $post_id ) ) {
+			return;
+		}
 
-			global $post, $current_user;
+		if ( ! isset( $_POST['s2_preview_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['s2_preview_nonce'] ), 's2_preview_' . $post_id ) ) {
+			return;
+		}
 
-			if ( 'never' !== $this->subscribe2_options['email_freq'] ) {
-				$this->subscribe2_cron( $current_user->user_email );
-			} else {
-				$this->publish( $post, $current_user->user_email );
-			}
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+
+		$post         = get_post( $post_id );
+		$current_user = wp_get_current_user();
+		if ( ! $post || empty( $current_user->user_email ) ) {
+			return;
+		}
+
+		if ( 'never' !== $this->subscribe2_options['email_freq'] ) {
+			$this->subscribe2_cron( $current_user->user_email );
+		} else {
+			$this->publish( $post, $current_user->user_email );
 		}
 	}
 
@@ -605,43 +632,134 @@ class S2_Admin extends S2_Core {
 	 * @return void
 	 */
 	public function s2_resend_handler( $post_id ) {
-		if ( ! isset( $_POST['s2_resend'] ) ) {
-			return;
-		}
-
-		if ( ( defined( 'DOING_CRON' ) && DOING_CRON ) || ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ) {
-			return;
-		}
-
-		if ( wp_is_post_revision( $post_id ) ) {
+		if ( ! isset( $_POST['s2_resend'] ) || ! $this->is_editor_save( $post_id ) ) {
 			return;
 		}
 
 		if ( ! isset( $_POST['s2_resend_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['s2_resend_nonce'] ), 's2_resend_' . $post_id ) ) {
+			$this->resend_result = 'expired';
 			return;
 		}
 
 		$post = get_post( $post_id );
 		if ( ! $post || ! $this->can_resend( $post ) ) {
+			$this->resend_result = 'denied';
 			return;
 		}
 
-		$this->publish( $post );
+		// The status change in this same save already ran publish() through its
+		// {old}_to_{new} hook, so resending now would mail subscribers twice.
+		if ( isset( $this->status_changed[ $post_id ] ) ) {
+			$this->resend_result = 'status_changed';
+			return;
+		}
+
+		$this->resend_result = $this->publish_and_report( $post ) ? 'sent' : 'not_sent';
 	}
 
 	/**
-	 * Whether the current user may resend the notification for a post.
+	 * Records the posts whose status changes in this request.
+	 *
+	 * @param string  $new_status
+	 * @param string  $old_status
+	 * @param WP_Post $post
+	 *
+	 * @return void
+	 */
+	public function s2_track_status_change( $new_status, $old_status, $post ) {
+		if ( $new_status !== $old_status ) {
+			$this->status_changed[ $post->ID ] = true;
+		}
+	}
+
+	/**
+	 * Carries the resend result to the post edit screen after the save redirect.
+	 *
+	 * @param string $location
+	 *
+	 * @return string
+	 */
+	public function s2_resend_redirect( $location ) {
+		if ( empty( $this->resend_result ) ) {
+			return $location;
+		}
+
+		return add_query_arg( 's2_resend_result', $this->resend_result, $location );
+	}
+
+	/**
+	 * Tells the user whether Resend Notification mailed anyone.
+	 *
+	 * @return void
+	 */
+	public function s2_resend_notice() {
+		if ( ! isset( $_GET['s2_resend_result'] ) ) {
+			return;
+		}
+
+		$messages = array(
+			'sent'           => array( 'success', __( 'Subscribe2 resent the notification email to current subscribers.', 'subscribe2' ) ),
+			'not_sent'       => array( 'warning', __( 'Subscribe2 sent no notification email. Check the post\'s notification override, its categories and format, the digest setting, and that there are subscribers.', 'subscribe2' ) ),
+			'status_changed' => array( 'warning', __( 'Subscribe2 did not resend the notification because the post status changed in this save. Any notification for the new status was sent as normal; click Resend Notification again to send another.', 'subscribe2' ) ),
+			'denied'         => array( 'error', __( 'Subscribe2 did not resend the notification. You need permission to send emails, and the post must be published.', 'subscribe2' ) ),
+			'expired'        => array( 'error', __( 'Subscribe2 did not resend the notification because the request could not be verified. Reload the page and try again.', 'subscribe2' ) ),
+		);
+
+		$result = sanitize_key( wp_unslash( $_GET['s2_resend_result'] ) );
+		if ( ! isset( $messages[ $result ] ) ) {
+			return;
+		}
+
+		printf( '<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>', esc_attr( $messages[ $result ][0] ), esc_html( $messages[ $result ][1] ) );
+	}
+
+	/**
+	 * Strips the resend result from the URL once its notice has been shown.
+	 *
+	 * @param array $args
+	 *
+	 * @return array
+	 */
+	public function s2_removable_query_args( $args ) {
+		$args[] = 's2_resend_result';
+		return $args;
+	}
+
+	/**
+	 * Whether this save_post call is the editor saving the post itself,
+	 * not cron, an autosave or the revision copy.
+	 *
+	 * @param int $post_id
+	 *
+	 * @return bool
+	 */
+	private function is_editor_save( $post_id ) {
+		if ( ( defined( 'DOING_CRON' ) && DOING_CRON ) || ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ) {
+			return false;
+		}
+
+		return ! wp_is_post_revision( $post_id );
+	}
+
+	/**
+	 * Runs publish() and reports whether it handed any email to wp_mail().
 	 *
 	 * @param WP_Post $post
 	 *
 	 * @return bool
 	 */
-	private function can_resend( $post ) {
-		if ( ! current_user_can( apply_filters( 's2_capability', 'manage_options', 'send' ) ) || ! current_user_can( 'edit_post', $post->ID ) ) {
-			return false;
-		}
+	private function publish_and_report( $post ) {
+		$mailed  = false;
+		$watcher = function ( $atts ) use ( &$mailed ) {
+			$mailed = true;
+			return $atts;
+		};
 
-		return 'publish' === $post->post_status || ( 'private' === $post->post_status && 'yes' === $this->subscribe2_options['private'] );
+		add_filter( 'wp_mail', $watcher );
+		$this->publish( $post );
+		remove_filter( 'wp_mail', $watcher );
+
+		return $mailed;
 	}
 
 	/**
