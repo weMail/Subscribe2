@@ -175,6 +175,12 @@ class S2_Block_Editor {
 			return false;
 		}
 
+		// Same rule as the classic editor's Resend box: never mail a draft,
+		// pending or scheduled post to the subscriber list.
+		if ( ! $mysubscribe2->can_resend( $post ) ) {
+			return false;
+		}
+
 		$mysubscribe2->publish( $post );
 		return true;
 	}

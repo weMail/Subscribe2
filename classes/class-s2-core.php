@@ -507,6 +507,25 @@ class S2_Core {
 	}
 
 	/**
+	 * Whether the current user may resend the notification for a post.
+	 *
+	 * Resending mails the live subscriber list, so it needs the same capability
+	 * as the Send Email screen plus edit rights on the post, and the post must
+	 * already be published (or private, when private notifications are on).
+	 *
+	 * @param WP_Post $post
+	 *
+	 * @return bool
+	 */
+	public function can_resend( $post ) {
+		if ( ! $post || ! current_user_can( apply_filters( 's2_capability', 'manage_options', 'send' ) ) || ! current_user_can( 'edit_post', $post->ID ) ) {
+			return false;
+		}
+
+		return 'publish' === $post->post_status || ( 'private' === $post->post_status && 'yes' === $this->subscribe2_options['private'] );
+	}
+
+	/**
 	 * Sends an email notification of a new post.
 	 *
 	 * @param object $post
@@ -2378,6 +2397,10 @@ class S2_Core {
 			add_action( 'save_post', array( $this, 's2_meta_handler' ) );
 			add_action( 'save_post', array( $this, 's2_preview_handler' ) );
 			add_action( 'save_post', array( $this, 's2_resend_handler' ) );
+			add_action( 'transition_post_status', array( $this, 's2_track_status_change' ), 10, 3 );
+			add_filter( 'redirect_post_location', array( $this, 's2_resend_redirect' ) );
+			add_action( 'admin_notices', array( $this, 's2_resend_notice' ) );
+			add_filter( 'removable_query_args', array( $this, 's2_removable_query_args' ) );
 			add_action( 'create_category', array( $this, 'new_category' ) );
 			add_action( 'delete_category', array( $this, 'delete_category' ) );
 
