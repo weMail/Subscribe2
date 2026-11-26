@@ -486,7 +486,7 @@ class S2_Admin extends S2_Core {
 			)
 		);
 
-		if ( 'publish' === $post->post_status || ( 'private' === $post->post_status && 'yes' === $this->subscribe2_options['private'] ) ) {
+		if ( $this->can_resend( $post ) ) {
 			add_meta_box(
 				'subscribe2-resend',
 				__( 'Subscribe2 Resend', 'subscribe2' ),
@@ -587,7 +587,8 @@ class S2_Admin extends S2_Core {
 	 *
 	 * @return void
 	 */
-	public function s2_resend_meta() {
+	public function s2_resend_meta( $post ) {
+		wp_nonce_field( 's2_resend_' . $post->ID, 's2_resend_nonce', false );
 		echo '<p>' . esc_html__( 'Resend the notification email of this post to current subscribers:', 'subscribe2' ) . '</p>' . "\r\n";
 		echo '<input class="button" name="s2_resend" type="submit" value="' . esc_attr( __( 'Resend Notification', 'subscribe2' ) ) . '" />' . "\r\n";
 	}
@@ -595,17 +596,52 @@ class S2_Admin extends S2_Core {
 	/**
 	 * Meta resend box handler.
 	 *
+	 * Resending mails the live subscriber list, so it needs the resend box's
+	 * own nonce, the same capability as the Send Email screen and the REST
+	 * resend route, and a post that is already published.
+	 *
+	 * @param int $post_id
+	 *
 	 * @return void
 	 */
-	public function s2_resend_handler() {
-		if ( isset( $_POST['s2_resend'] ) ) {
-			if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
-				return;
-			}
-
-			global $post;
-			$this->publish( $post );
+	public function s2_resend_handler( $post_id ) {
+		if ( ! isset( $_POST['s2_resend'] ) ) {
+			return;
 		}
+
+		if ( ( defined( 'DOING_CRON' ) && DOING_CRON ) || ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ) {
+			return;
+		}
+
+		if ( wp_is_post_revision( $post_id ) ) {
+			return;
+		}
+
+		if ( ! isset( $_POST['s2_resend_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['s2_resend_nonce'] ), 's2_resend_' . $post_id ) ) {
+			return;
+		}
+
+		$post = get_post( $post_id );
+		if ( ! $post || ! $this->can_resend( $post ) ) {
+			return;
+		}
+
+		$this->publish( $post );
+	}
+
+	/**
+	 * Whether the current user may resend the notification for a post.
+	 *
+	 * @param WP_Post $post
+	 *
+	 * @return bool
+	 */
+	private function can_resend( $post ) {
+		if ( ! current_user_can( apply_filters( 's2_capability', 'manage_options', 'send' ) ) || ! current_user_can( 'edit_post', $post->ID ) ) {
+			return false;
+		}
+
+		return 'publish' === $post->post_status || ( 'private' === $post->post_status && 'yes' === $this->subscribe2_options['private'] );
 	}
 
 	/**
